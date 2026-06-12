@@ -205,13 +205,52 @@
   box-shadow: 0 0 0 3px rgba(46,204,113,0.25);
 }
 
-/* ── Category accent stripe (left border) ── */
+/* ── Circle nodes — Start & End ── */
+.canvas-node[data-type="start"],
+.canvas-node[data-type="end"] {
+  min-width: unset;
+  max-width: unset;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border-width: 2.5px;
+  overflow: visible;
+}
+.canvas-node[data-type="start"] { border-color: var(--color-start); background: rgba(26,188,156,0.12); }
+.canvas-node[data-type="end"]   { border-color: var(--color-end);   background: rgba(231,76,60,0.12);  }
+.canvas-node[data-type="start"].selected { box-shadow: 0 0 0 3px rgba(26,188,156,0.3), 0 4px 16px rgba(0,0,0,0.5); }
+.canvas-node[data-type="end"].selected   { box-shadow: 0 0 0 3px rgba(231,76,60,0.3),  0 4px 16px rgba(0,0,0,0.5); }
+
+.node-circle {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  overflow: hidden;
+  cursor: move;
+}
+.circle-icon  { font-size: 22px; line-height: 1; }
+.circle-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  color: var(--text-primary);
+  text-transform: uppercase;
+}
+.canvas-node[data-type="start"] .circle-icon { color: var(--color-start); }
+.canvas-node[data-type="end"]   .circle-icon { color: var(--color-end);   }
+
+/* ── Category accent stripe (left border) — skip circle nodes ── */
 .canvas-node[data-category="agent"]   { border-left-color: var(--color-agent);   border-left-width: 3px; }
 .canvas-node[data-category="work"]    { border-left-color: var(--color-work);    border-left-width: 3px; }
 .canvas-node[data-category="infra"]   { border-left-color: var(--color-infra);   border-left-width: 3px; }
 .canvas-node[data-category="control"] { border-left-color: var(--color-control); border-left-width: 3px; }
-.canvas-node[data-category="start"]   { border-left-color: var(--color-start);   border-left-width: 3px; }
-.canvas-node[data-category="end"]     { border-left-color: var(--color-end);     border-left-width: 3px; }
+.canvas-node[data-type="start"],
+.canvas-node[data-type="end"] { border-left-width: 2.5px; }
 
 /* ── Node header icon colors match category ── */
 .canvas-node[data-category="agent"]   .nh-icon { background: rgba(74,124,255,0.15); color: var(--color-agent); }

@@ -47,33 +47,48 @@ AF.buildNodeEl = function (node) {
   el.className         = 'canvas-node';
   el.id                = node.id;
   el.dataset.category  = node.category;
+  el.dataset.type      = node.type;
   el.dataset.nodeId    = node.id;
   el.style.left        = node.x + 'px';
   el.style.top         = node.y + 'px';
 
   var ports = PORT_SIDES.map(portMarkup).join('');
 
-  el.innerHTML =
-    ports
-    + '<div class="node-main">'
-    + '<div class="node-header" data-drag-handle>'
-    + '<div class="nh-icon">' + node.icon + '</div>'
-    + '<div class="nh-title">' + node.label + '</div>'
-    + '<div class="nh-type">' + fmtType(node.type) + '</div>'
-    + '</div>'
-    + '<div class="node-body">' + renderBody(fields, node.props) + '</div>'
-    + '</div>';
+  if (node.type === 'start' || node.type === 'end') {
+    el.innerHTML =
+      ports
+      + '<div class="node-main node-circle" data-drag-handle>'
+      + '<div class="circle-icon">' + node.icon + '</div>'
+      + '<div class="circle-label">' + node.label + '</div>'
+      + '</div>';
+  } else {
+    el.innerHTML =
+      ports
+      + '<div class="node-main">'
+      + '<div class="node-header" data-drag-handle>'
+      + '<div class="nh-icon">' + node.icon + '</div>'
+      + '<div class="nh-title">' + node.label + '</div>'
+      + '<div class="nh-type">' + fmtType(node.type) + '</div>'
+      + '</div>'
+      + '<div class="node-body">' + renderBody(fields, node.props) + '</div>'
+      + '</div>';
+  }
 
   return el;
 };
 
 AF.updateNodeEl = function (el, node) {
   if (!el) return;
-  var fields = BODY_FIELDS[node.type] || [];
   el.style.left = node.x + 'px';
   el.style.top  = node.y + 'px';
-  el.querySelector('.nh-title').textContent = node.label;
-  el.querySelector('.node-body').innerHTML  = renderBody(fields, node.props);
+  if (node.type === 'start' || node.type === 'end') {
+    var lbl = el.querySelector('.circle-label');
+    if (lbl) lbl.textContent = node.label;
+  } else {
+    var fields = BODY_FIELDS[node.type] || [];
+    el.querySelector('.nh-title').textContent = node.label;
+    el.querySelector('.node-body').innerHTML  = renderBody(fields, node.props);
+  }
 };
 
 function renderBody(fields, props) {
