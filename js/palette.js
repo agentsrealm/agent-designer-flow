@@ -102,8 +102,8 @@ function renderConnectionGuide(container) {
 
     // instruction steps
     + '<div class="connect-steps">'
-    + '<div class="connect-step"><span class="cs-num">1</span><span class="cs-text">Hover a node — a <strong>+</strong> handle appears at the bottom</span></div>'
-    + '<div class="connect-step"><span class="cs-num">2</span><span class="cs-text">Drag from <strong>+</strong> to any other node</span></div>'
+    + '<div class="connect-step"><span class="cs-num">1</span><span class="cs-text">Hover a node — connection handles appear on all sides</span></div>'
+    + '<div class="connect-step"><span class="cs-num">2</span><span class="cs-text">Drag from any handle to another node</span></div>'
     + '<div class="connect-step"><span class="cs-num">3</span><span class="cs-text">Release on the target — arrow is created</span></div>'
     + '<div class="connect-step"><span class="cs-num">4</span><span class="cs-text">Click the arrow to change its type or label</span></div>'
     + '</div>'

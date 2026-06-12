@@ -32,6 +32,14 @@ var BODY_FIELDS = {
   'end':             ['returnFormat'],
 };
 
+var PORT_SIDES = ['top', 'right', 'bottom', 'left'];
+
+function portMarkup(side) {
+  return '<div class="port-anchor port-anchor-' + side + '">'
+    + '<div class="node-port" data-side="' + side + '"><div class="port-dot"></div></div>'
+    + '</div>';
+}
+
 AF.buildNodeEl = function (node) {
   var fields = BODY_FIELDS[node.type] || [];
 
@@ -43,22 +51,18 @@ AF.buildNodeEl = function (node) {
   el.style.left        = node.x + 'px';
   el.style.top         = node.y + 'px';
 
-  var inPort  = node.type !== 'start'
-    ? '<div class="node-port port-in"  data-port="in" ><div class="port-dot"></div><span class="port-label">Connect</span></div>'
-    : '';
-  var outPort = node.type !== 'end'
-    ? '<div class="node-port port-out" data-port="out"><div class="port-dot"></div><span class="port-label">Drag to connect</span></div>'
-    : '';
+  var ports = PORT_SIDES.map(portMarkup).join('');
 
   el.innerHTML =
-    (inPort ? '<div class="port-anchor port-anchor-top">'  + inPort  + '</div>' : '')
+    ports
+    + '<div class="node-main">'
     + '<div class="node-header" data-drag-handle>'
     + '<div class="nh-icon">' + node.icon + '</div>'
     + '<div class="nh-title">' + node.label + '</div>'
     + '<div class="nh-type">' + fmtType(node.type) + '</div>'
     + '</div>'
     + '<div class="node-body">' + renderBody(fields, node.props) + '</div>'
-    + (outPort ? '<div class="port-anchor port-anchor-bottom">' + outPort + '</div>' : '');
+    + '</div>';
 
   return el;
 };

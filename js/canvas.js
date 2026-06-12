@@ -59,28 +59,17 @@ function paintGrid() {
   var bigStep = step * 5;             // every 5th dot is larger (100px at zoom=1)
 
   // colour palette
-  var minorDot = isLight ? 'rgba(160,170,200,0.75)' : 'rgba(55,68,105,0.9)';
-  var majorDot = isLight ? 'rgba(110,125,175,0.95)' : 'rgba(90,110,170,1)';
-  var minorR   = Math.max(0.8, zoom * 0.85);
-  var majorR   = Math.max(1.4, zoom * 1.6);
+  var dotColor = isLight ? 'rgba(160,170,200,0.8)' : 'rgba(55,68,105,0.95)';
+  var dotR     = Math.max(0.8, zoom * 0.9);
 
-  // starting dot offset (keeps grid stable while panning)
   var startX = ((panX % step) + step) % step;
   var startY = ((panY % step) + step) % step;
 
-  // world coord of first visible dot
-  var worldX0 = -panX + startX;   // world-x of the first rendered dot column
-  var worldY0 = -panY + startY;
-
+  ctx.fillStyle = dotColor;
   for (var cx = startX; cx <= w; cx += step) {
     for (var cy = startY; cy <= h; cy += step) {
-      // a dot is "major" if it aligns with the 100-unit world grid
-      var wx = cx - panX;
-      var wy = cy - panY;
-      var isMajor = (Math.round(wx / step) % 5 === 0) && (Math.round(wy / step) % 5 === 0);
       ctx.beginPath();
-      ctx.arc(cx, cy, isMajor ? majorR : minorR, 0, 6.2832);
-      ctx.fillStyle = isMajor ? majorDot : minorDot;
+      ctx.arc(cx, cy, dotR, 0, 6.2832);
       ctx.fill();
     }
   }
@@ -171,12 +160,13 @@ function bindNodeInteractions() {
 
     var portEl = e.target.closest('.node-port');
     if (portEl) {
-      if (portEl.dataset.port === 'out') {
-        var dot = portEl.querySelector('.port-dot').getBoundingClientRect();
-        AF.startConnection(nodeEl.dataset.nodeId, dot.left + dot.width/2, dot.top + dot.height/2);
-        // highlight all valid in-ports
+      var srcNode = AF.store.getNode(nodeEl.dataset.nodeId);
+      if (srcNode && srcNode.type !== 'end') {
+        AF.startConnection(nodeEl.dataset.nodeId, portEl.dataset.side, e.clientX, e.clientY);
         _canvas.querySelectorAll('.canvas-node').forEach(function (n) {
-          if (n.id !== nodeEl.id) n.classList.add('drop-target');
+          if (n.id === nodeEl.id) return;
+          var nd = AF.store.getNode(n.id);
+          if (nd && nd.type !== 'start') n.classList.add('drop-target');
         });
         e.preventDefault();
       }
@@ -198,7 +188,20 @@ function bindNodeInteractions() {
   });
 
   window.addEventListener('mousemove', function (e) {
-    if (AF.isConnecting()) { AF.updateConnection(e.clientX, e.clientY); return; }
+    if (AF.isConnecting()) {
+      AF.updateConnection(e.clientX, e.clientY);
+      _canvas.querySelectorAll('.node-port.port-highlight').forEach(function (p) {
+        p.classList.remove('port-highlight');
+      });
+      var hover = document.elementFromPoint(e.clientX, e.clientY);
+      var hoverNode = hover && hover.closest('.canvas-node');
+      if (hoverNode && hoverNode.id !== AF.connectingSourceId()) {
+        var side = AF.nearestPortSide(hoverNode, e.clientX, e.clientY);
+        var port = hoverNode.querySelector('.node-port[data-side="' + side + '"]');
+        if (port) port.classList.add('port-highlight');
+      }
+      return;
+    }
     if (!dragging) return;
     didMove = true;
     var rect = _canvasContainer.getBoundingClientRect();
@@ -218,9 +221,17 @@ function bindNodeInteractions() {
       _canvas.querySelectorAll('.drop-target').forEach(function (n) { n.classList.remove('drop-target'); });
       var tgt     = document.elementFromPoint(e.clientX, e.clientY);
       var tgtNode = tgt && tgt.closest('.canvas-node');
-      // accept drop anywhere on the target node (not just on the dot)
       if (tgtNode && tgtNode.id !== AF.connectingSourceId()) {
-        AF.endConnection(tgtNode.dataset.nodeId);
+        var tgtData = AF.store.getNode(tgtNode.dataset.nodeId);
+        if (tgtData && tgtData.type !== 'start') {
+          var tgtPort = tgt && tgt.closest('.node-port');
+          var targetSide = tgtPort
+            ? tgtPort.dataset.side
+            : AF.nearestPortSide(tgtNode, e.clientX, e.clientY);
+          AF.endConnection(tgtNode.dataset.nodeId, targetSide);
+        } else {
+          AF.cancelConnection();
+        }
       } else {
         AF.cancelConnection();
       }
