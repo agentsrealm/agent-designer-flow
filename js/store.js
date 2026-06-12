@@ -76,9 +76,15 @@ window.AF = window.AF || {};
       _state.edges.push(edge); emit('edges');
     },
     updateEdge(id, patch) {
-      this._push();
       const e = AF.store.getEdge(id); if (!e) return;
-      Object.assign(e, patch); emit('edges');
+      const source = patch.source !== undefined ? patch.source : e.source;
+      const target = patch.target !== undefined ? patch.target : e.target;
+      if (source === target) return;
+      const dup = _state.edges.some(x => x.id !== id && x.source === source && x.target === target);
+      if (dup) return;
+      this._push();
+      Object.assign(e, patch);
+      emit('edges');
     },
     deleteEdge(id) {
       this._push();

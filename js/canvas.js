@@ -188,6 +188,10 @@ function bindNodeInteractions() {
   });
 
   window.addEventListener('mousemove', function (e) {
+    if (AF.isRewiring()) {
+      AF.updateRewire(e.clientX, e.clientY);
+      return;
+    }
     if (AF.isConnecting()) {
       AF.updateConnection(e.clientX, e.clientY);
       _canvas.querySelectorAll('.node-port.port-highlight').forEach(function (p) {
@@ -216,6 +220,10 @@ function bindNodeInteractions() {
   });
 
   window.addEventListener('mouseup', function (e) {
+    if (AF.isRewiring()) {
+      AF.endRewire(e.clientX, e.clientY);
+      return;
+    }
     if (AF.isConnecting()) {
       // clear drop-target highlights
       _canvas.querySelectorAll('.drop-target').forEach(function (n) { n.classList.remove('drop-target'); });
