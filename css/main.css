@@ -61,7 +61,6 @@ body.theme-light {
   --teal:           #0d9488;
   --orange:         #ea580c;
 }
-}
 
 html, body, #app {
   height: 100%;
@@ -161,6 +160,12 @@ html, body, #app {
 #workspace {
   display: flex;
   height: calc(100% - var(--topbar-h));
+  min-height: 0;
+  overflow: hidden;
+}
+
+#workspace > aside {
+  min-height: 0;
   overflow: hidden;
 }
 
