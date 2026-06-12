@@ -1,0 +1,178 @@
+/* ============================================================
+   palette.css — left panel, node palette, groups
+   ============================================================ */
+
+#palette {
+  width: var(--palette-w);
+  min-width: var(--palette-w);
+  background: var(--bg-surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  user-select: none;
+}
+
+.palette-search {
+  padding: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.palette-search input {
+  width: 100%;
+  background: var(--bg-base);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 12px;
+  padding: 5px 8px;
+  outline: none;
+}
+.palette-search input:focus { border-color: var(--border-focus); }
+.palette-search input::placeholder { color: var(--text-muted); }
+
+#palette-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 0;
+}
+
+/* ── Group / Category ── */
+.palette-group { margin-bottom: 2px; }
+
+.palette-group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px 4px;
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  transition: color 0.15s;
+}
+.palette-group-header:hover { color: var(--text-secondary); }
+.palette-group-header .chevron {
+  font-size: 9px;
+  transition: transform 0.15s;
+}
+.palette-group-header.collapsed .chevron { transform: rotate(-90deg); }
+
+.palette-group-body {
+  padding: 2px 6px 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.palette-group-body.collapsed { display: none; }
+
+/* ── Palette Node Item ── */
+.palette-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+  cursor: grab;
+  border: 1px solid transparent;
+  transition: background 0.12s, border-color 0.12s;
+  position: relative;
+}
+.palette-item:hover {
+  background: var(--bg-hover);
+  border-color: var(--border);
+}
+.palette-item:active { cursor: grabbing; }
+
+.palette-item .node-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.palette-item .node-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  flex: 1;
+  line-height: 1.3;
+}
+.palette-item:hover .node-label { color: var(--text-primary); }
+
+.palette-item .node-desc {
+  font-size: 10px;
+  color: var(--text-muted);
+  line-height: 1.2;
+}
+
+/* ── Category color coding ── */
+.palette-item[data-category="agent"] .node-icon   { background: rgba(74,124,255,0.15); color: var(--color-agent); }
+.palette-item[data-category="work"] .node-icon    { background: rgba(46,204,113,0.15); color: var(--color-work); }
+.palette-item[data-category="infra"] .node-icon   { background: rgba(155,89,182,0.15); color: var(--color-infra); }
+.palette-item[data-category="control"] .node-icon { background: rgba(243,156,18,0.15); color: var(--color-control); }
+.palette-item[data-category="start"] .node-icon   { background: rgba(26,188,156,0.15); color: var(--color-start); }
+.palette-item[data-category="end"] .node-icon     { background: rgba(231,76,60,0.15);  color: var(--color-end); }
+
+/* drag ghost */
+.palette-drag-ghost {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.85;
+  transform: scale(0.9);
+}
+
+/* ── Connection guide ── */
+.connect-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+.connect-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+.cs-num {
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.cs-text strong { color: var(--text-primary); }
+
+/* ── Edge legend ── */
+.edge-legend-title {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  padding-top: 4px;
+  border-top: 1px solid var(--border);
+}
+.edge-legend-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 0;
+}
+.edge-legend-label {
+  font-size: 11px;
+  color: var(--text-secondary);
+}

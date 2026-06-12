@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agent Flow Designer</title>
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="css/palette.css" />
+  <link rel="stylesheet" href="css/canvas.css" />
+  <link rel="stylesheet" href="css/properties.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- Top Bar -->
+    <header id="topbar">
+      <div class="topbar-left">
+        <span class="logo">⬡ AgentFlow</span>
+        <span class="flow-name" id="flow-name-label" contenteditable="true">Untitled Flow</span>
+      </div>
+      <div class="topbar-center">
+        <button class="btn-icon" id="btn-undo" title="Undo">↩</button>
+        <button class="btn-icon" id="btn-redo" title="Redo">↪</button>
+        <button class="btn-icon" id="btn-zoom-in" title="Zoom In">＋</button>
+        <button class="btn-icon" id="btn-zoom-out" title="Zoom Out">－</button>
+        <button class="btn-icon" id="btn-fit" title="Fit to Screen">⊡</button>
+        <button class="btn-icon" id="btn-auto-layout" title="Auto Layout">⋮⋮</button>
+      </div>
+      <div class="topbar-right">
+        <button class="btn-icon" id="btn-theme" title="Toggle Light / Dark theme">☀</button>
+        <button class="btn-outline" id="btn-validate">Validate</button>
+        <button class="btn-outline" id="btn-import">Import JSON</button>
+        <button class="btn-outline" id="btn-export">Export JSON</button>
+        <button class="btn-primary" id="btn-test-run">▶ Test Run</button>
+      </div>
+    </header>
+
+    <div id="workspace">
+      <!-- Left Palette -->
+      <aside id="palette">
+        <div class="palette-search">
+          <input type="text" id="palette-search" placeholder="Search nodes..." />
+        </div>
+        <div id="palette-content"></div>
+      </aside>
+
+      <!-- Center Canvas -->
+      <main id="canvas-container">
+        <canvas id="grid-canvas"></canvas>
+        <svg id="edges-svg"></svg>
+        <div id="canvas" tabindex="0"></div>
+        <div id="minimap">
+          <canvas id="minimap-canvas"></canvas>
+        </div>
+        <div id="canvas-hint">Drag nodes from the left panel to get started</div>
+      </main>
+
+      <!-- Right Properties -->
+      <aside id="properties-panel">
+        <div id="properties-empty">
+          <div class="empty-icon">⚙</div>
+          <p>Select a node to configure it</p>
+        </div>
+        <div id="properties-content" style="display:none"></div>
+      </aside>
+    </div>
+
+    <!-- Validation Panel (slide up) -->
+    <div id="validation-panel" class="hidden">
+      <div class="validation-header">
+        <span>Validation</span>
+        <button id="btn-close-validation">✕</button>
+      </div>
+      <div id="validation-results"></div>
+    </div>
+
+    <!-- Test Run Panel -->
+    <div id="testrun-panel" class="hidden">
+      <div class="panel-header">
+        <span>Test Run</span>
+        <button id="btn-close-testrun">✕</button>
+      </div>
+      <div id="testrun-content">
+        <label>Input payload (JSON)</label>
+        <textarea id="testrun-input" rows="6" placeholder='{ "message": "Hello" }'></textarea>
+        <button class="btn-primary full-width" id="btn-run-flow">Run Flow</button>
+        <div id="testrun-trace"></div>
+      </div>
+    </div>
+
+    <!-- Context Menu -->
+    <div id="context-menu" class="hidden">
+      <ul id="context-menu-list"></ul>
+    </div>
+  </div>
+
+  <!-- Hidden file input for import -->
+  <input type="file" id="import-file" accept=".json" style="display:none" />
+
+  <!-- load in dependency order, no ES module needed -->
+  <script src="data/node-types.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/palette.js"></script>
+  <script src="js/nodes.js"></script>
+  <script src="js/edges.js"></script>
+  <script src="js/canvas.js"></script>
+  <script src="js/properties.js"></script>
+  <script src="js/validation.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
