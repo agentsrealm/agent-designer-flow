@@ -38,6 +38,18 @@ window.AF = window.AF || {};
     });
     document.getElementById('btn-run-flow').addEventListener('click', simulateRun);
 
+    document.getElementById('btn-new').addEventListener('click', function () {
+      if (AF.store.get('nodes').length > 0) {
+        if (!confirm('Clear the canvas and start a new flow?')) return;
+      }
+      AF.store.importJSON({
+        schema: 'agent-flow/v1',
+        metadata: { name: 'Untitled Flow' },
+        nodes: [], edges: [], runtime: { engine: 'agentcore' },
+      });
+      document.getElementById('flow-name-label').textContent = 'Untitled Flow';
+    });
+
     var nameEl = document.getElementById('flow-name-label');
     nameEl.addEventListener('input', function () { AF.store.setFlowName(nameEl.textContent.trim()); });
     AF.store.on('import', function () { nameEl.textContent = AF.store.get('flowName'); });
