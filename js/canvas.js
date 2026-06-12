@@ -112,13 +112,24 @@ function bindDrop() {
   });
 }
 
+/* ── Pan Mode toggle (hand tool) ── */
+var _panMode = false;
+
+AF.setPanMode = function (on) {
+  _panMode = on;
+  _canvasContainer.style.cursor = on ? 'grab' : '';
+};
+
+AF.isPanMode = function () { return _panMode; };
+
 /* ── Pan & Zoom ── */
 function bindPanZoom() {
   var isPanning = false, startX, startY, startPanX, startPanY;
 
   _canvasContainer.addEventListener('mousedown', function (e) {
     if (e.target !== _canvasContainer && e.target !== _canvas && e.target !== _gridCanvas) return;
-    if (e.button !== 1 && !(e.button === 0 && e.altKey)) return;
+    var isPanTrigger = e.button === 1 || (e.button === 0 && e.altKey) || (e.button === 0 && _panMode);
+    if (!isPanTrigger) return;
     isPanning = true;
     startX = e.clientX; startY = e.clientY;
     startPanX = AF.store.get('panX'); startPanY = AF.store.get('panY');
@@ -130,7 +141,7 @@ function bindPanZoom() {
     AF.store.setPan(startPanX + e.clientX - startX, startPanY + e.clientY - startY);
   });
   window.addEventListener('mouseup', function () {
-    if (isPanning) { isPanning = false; _canvasContainer.style.cursor = ''; }
+    if (isPanning) { isPanning = false; _canvasContainer.style.cursor = _panMode ? 'grab' : ''; }
   });
 
   _canvasContainer.addEventListener('wheel', function (e) {

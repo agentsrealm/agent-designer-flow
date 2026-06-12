@@ -38,6 +38,14 @@ window.AF = window.AF || {};
     });
     document.getElementById('btn-run-flow').addEventListener('click', simulateRun);
 
+    var panBtn = document.getElementById('btn-pan-mode');
+    panBtn.addEventListener('click', function () {
+      var on = !AF.isPanMode();
+      AF.setPanMode(on);
+      panBtn.classList.toggle('active', on);
+      panBtn.title = on ? 'Pan Mode ON — click to disable' : 'Pan Mode (drag canvas)';
+    });
+
     document.getElementById('btn-new').addEventListener('click', function () {
       if (AF.store.get('nodes').length > 0) {
         if (!confirm('Clear the canvas and start a new flow?')) return;

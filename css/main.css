@@ -129,6 +129,8 @@ html, body, #app {
   transition: background 0.15s, color 0.15s;
 }
 .btn-icon:hover { background: var(--bg-hover); color: var(--text-primary); }
+.btn-icon.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.btn-icon.active:hover { background: var(--accent-hover); }
 
 .btn-outline {
   background: none;
