@@ -64,7 +64,11 @@ window.AF = window.AF || {};
       localStorage.setItem('af-theme', light ? 'light' : 'dark');
     }
     applyTheme(isLight);
-    themeBtn.addEventListener('click', function () { applyTheme(!isLight); });
+    themeBtn.addEventListener('click', function () {
+      applyTheme(!isLight);
+      // repaint grid with new palette
+      AF.store.setZoom(AF.store.get('zoom'));
+    });
   }
 
   /* ── Simulate test run ── */

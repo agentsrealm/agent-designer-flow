@@ -6,7 +6,7 @@
   flex: 1;
   position: relative;
   overflow: hidden;
-  background: var(--bg-base);
+  background: transparent; /* painted by grid canvas */
 }
 
 #grid-canvas {
@@ -289,7 +289,6 @@
 }
 
 /* ── Light theme canvas overrides ── */
-body.theme-light #canvas-container { background: #e8ebf4; }
-body.theme-light .canvas-node      { box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-body.theme-light .canvas-node:hover{ box-shadow: 0 4px 16px rgba(0,0,0,0.18); }
+body.theme-light .canvas-node      { box-shadow: 0 2px 8px rgba(0,0,0,0.10); }
+body.theme-light .canvas-node:hover{ box-shadow: 0 4px 16px rgba(0,0,0,0.16); }
 body.theme-light #minimap          { background: #fff; }

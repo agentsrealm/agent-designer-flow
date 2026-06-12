@@ -45,18 +45,45 @@ function resizeGrid() {
 }
 
 function paintGrid() {
-  var ctx  = _gridCanvas.getContext('2d');
-  var w    = _gridCanvas.width, h = _gridCanvas.height;
-  var zoom = AF.store.get('zoom');
-  var panX = AF.store.get('panX'), panY = AF.store.get('panY');
-  var step = GRID * zoom;
-  ctx.clearRect(0, 0, w, h);
-  ctx.strokeStyle = 'rgba(42,51,80,0.7)';
-  ctx.lineWidth   = 0.5;
-  var ox = ((panX % step) + step) % step;
-  var oy = ((panY % step) + step) % step;
-  for (var x = ox; x < w; x += step) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,h); ctx.stroke(); }
-  for (var y = oy; y < h; y += step) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke(); }
+  var ctx     = _gridCanvas.getContext('2d');
+  var w       = _gridCanvas.width, h = _gridCanvas.height;
+  var zoom    = AF.store.get('zoom');
+  var panX    = AF.store.get('panX'), panY = AF.store.get('panY');
+  var isLight = document.body.classList.contains('theme-light');
+
+  // background
+  ctx.fillStyle = isLight ? '#ffffff' : '#0f1117';
+  ctx.fillRect(0, 0, w, h);
+
+  var step    = GRID * zoom;          // pixels between dots
+  var bigStep = step * 5;             // every 5th dot is larger (100px at zoom=1)
+
+  // colour palette
+  var minorDot = isLight ? 'rgba(160,170,200,0.75)' : 'rgba(55,68,105,0.9)';
+  var majorDot = isLight ? 'rgba(110,125,175,0.95)' : 'rgba(90,110,170,1)';
+  var minorR   = Math.max(0.8, zoom * 0.85);
+  var majorR   = Math.max(1.4, zoom * 1.6);
+
+  // starting dot offset (keeps grid stable while panning)
+  var startX = ((panX % step) + step) % step;
+  var startY = ((panY % step) + step) % step;
+
+  // world coord of first visible dot
+  var worldX0 = -panX + startX;   // world-x of the first rendered dot column
+  var worldY0 = -panY + startY;
+
+  for (var cx = startX; cx <= w; cx += step) {
+    for (var cy = startY; cy <= h; cy += step) {
+      // a dot is "major" if it aligns with the 100-unit world grid
+      var wx = cx - panX;
+      var wy = cy - panY;
+      var isMajor = (Math.round(wx / step) % 5 === 0) && (Math.round(wy / step) % 5 === 0);
+      ctx.beginPath();
+      ctx.arc(cx, cy, isMajor ? majorR : minorR, 0, 6.2832);
+      ctx.fillStyle = isMajor ? majorDot : minorDot;
+      ctx.fill();
+    }
+  }
 }
 
 /* ── Transform ── */
