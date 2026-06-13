@@ -20,6 +20,12 @@ window.AF = window.AF || {};
 
   /* ── Topbar ── */
   function bindTopbar() {
+    document.getElementById('btn-ai-companion').addEventListener('click', function () {
+      if (AF.embed && AF.embed.isEmbed && AF.embed.postToParent) {
+        AF.embed.postToParent('FLOW_OPEN_AI_COMPANION', null);
+      }
+    });
+
     document.getElementById('btn-undo').addEventListener('click', function(){ AF.store.undo(); });
     document.getElementById('btn-redo').addEventListener('click', function(){ AF.store.redo(); });
     document.getElementById('btn-zoom-in').addEventListener('click', AF.zoomIn);
