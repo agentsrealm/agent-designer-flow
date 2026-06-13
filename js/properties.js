@@ -106,6 +106,9 @@ function buildGeneralTab(node, p) {
   else if (t==='task')         extra = field('Description', ta('description',p.description,'What does this task do?',3)) + field('Assigned Agent', inp('assignedAgent',p.assignedAgent,'Agent ID or name'));
   else if (t==='llm-task')     extra = field('Description', ta('description',p.description||'','',2)) + field('Assigned Agent', inp('assignedAgent',p.assignedAgent||'',''));
   else if (t==='tool-task')    extra = field('Tool Name', inp('toolName',p.toolName,'e.g. web_search')) + field('Endpoint', inp('endpoint',p.endpoint,'https://...'));
+  else if (t==='tool-call')    extra = field('Call Type', sel('callType',p.callType||'mcp',['mcp','api'])) + field('Server / Endpoint', inp('serverUrl',p.serverUrl||'','mcp://... or https://...')) + field('Tool Name', inp('toolName',p.toolName||'','e.g. search_documents'));
+  else if (t==='skill')        extra = field('Skill ID', inp('skillId',p.skillId||'','Unique skill identifier')) + field('Description', ta('description',p.description||'','What this reusable skill does',2)) + field('Version', inp('version',p.version||'1.0',''));
+  else if (t==='subflow')      extra = field('Flow Reference', inp('flowRef',p.flowRef||'','Flow name or path')) + field('Flow ID', inp('flowId',p.flowId||'','Nested flow ID')) + field('Description', ta('description',p.description||'','',2)) + tog('Run Async','async',p.async);
   else if (t==='api-task')     extra = field('Method', sel('method',p.method,['GET','POST','PUT','PATCH','DELETE'])) + field('URL', inp('url',p.url,'https://...'));
   else if (t==='human-approval') extra = field('Approval Question', ta('approvalQuestion',p.approvalQuestion,'What should the approver decide?',3));
   else if (t==='notification') extra = field('Channel', sel('channel',p.channel,['slack','email','teams','webhook','sms'])) + field('Recipient', inp('recipient',p.recipient,'#channel or email'));

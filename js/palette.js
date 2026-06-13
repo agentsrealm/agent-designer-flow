@@ -12,8 +12,11 @@ AF.getItemDef = function (type) {
 AF.initPalette = function () {
   var content     = document.getElementById('palette-content');
   var searchInput = document.getElementById('palette-search');
+  var paletteGroups = AF.NODE_GROUPS.filter(function (g) {
+    return g.id !== 'agents' && g.id !== 'infra';
+  });
 
-  renderGroups(content, AF.NODE_GROUPS);
+  renderGroups(content, paletteGroups);
   renderConnectionGuide(content);
   initSearch(searchInput, content);
 };
