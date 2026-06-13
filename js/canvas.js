@@ -265,6 +265,26 @@ function bindNodeInteractions() {
     dragging = null;
   });
 
+  _canvasContainer.addEventListener('contextmenu', function (e) {
+    var nodeEl = e.target.closest('.canvas-node');
+    if (nodeEl) {
+      // Node right-click — context menu handled below
+      return;
+    }
+    // Empty background right-click: toggle pan mode
+    var onEmptyBackground = e.target === _canvasContainer || e.target === _canvas || e.target === _gridCanvas;
+    if (onEmptyBackground) {
+      e.preventDefault();
+      var on = !_panMode;
+      AF.setPanMode(on);
+      var panBtn = document.getElementById('btn-pan-mode');
+      if (panBtn) {
+        panBtn.classList.toggle('active', on);
+        panBtn.title = on ? 'Pan Mode ON — right-click empty canvas to disable' : 'Pan Mode (drag canvas)';
+      }
+    }
+  });
+
   _canvas.addEventListener('contextmenu', function (e) {
     var nodeEl = e.target.closest('.canvas-node');
     if (!nodeEl) return;
