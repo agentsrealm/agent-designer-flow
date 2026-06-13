@@ -174,6 +174,8 @@ html, body, #app {
 .flow-options-menu-item:hover {
   background: var(--bg-hover, var(--bg-panel));
 }
+.flow-options-menu-item--danger { color: #e74c3c; }
+.flow-options-menu-item--danger:hover { background: rgba(231,76,60,0.08); }
 .flow-options-menu-separator {
   height: 1px;
   background: var(--border);

@@ -118,6 +118,64 @@ window.AF = window.AF || {};
       alert('Unpublished: ' + name);
     });
 
+    document.getElementById('fom-export').addEventListener('click', function () {
+      closeFlowMenu();
+      var data = AF.store.exportJSON();
+      var name = (data.metadata && data.metadata.name) || 'flow';
+      var slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+      var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      var url  = URL.createObjectURL(blob);
+      var a    = document.createElement('a');
+      a.href     = url;
+      a.download = slug + '.agentflow.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+
+    var importInput = document.getElementById('fom-import-input');
+    document.getElementById('fom-import').addEventListener('click', function () {
+      closeFlowMenu();
+      importInput.value = '';
+      importInput.click();
+    });
+    importInput.addEventListener('change', function () {
+      var file = importInput.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        try {
+          var data = JSON.parse(e.target.result);
+          if (!data.nodes || !data.edges) { alert('Invalid AgentFlow JSON — missing nodes or edges.'); return; }
+          if (!confirm('Import "' + ((data.metadata && data.metadata.name) || file.name) + '"? This will replace the current canvas.')) return;
+          AF.store.importJSON(data);
+          var nameEl = document.getElementById('flow-name-label');
+          if (nameEl) nameEl.textContent = AF.store.get('flowName');
+        } catch (err) {
+          alert('Could not parse file: ' + err.message);
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    document.getElementById('fom-close').addEventListener('click', function () {
+      closeFlowMenu();
+      if (AF.embed && AF.embed.isEmbed && AF.embed.postToParent) {
+        AF.embed.postToParent('FLOW_CLOSE', null);
+      } else {
+        if (confirm('Close this flow? Unsaved changes will be lost.')) {
+          AF.store.importJSON({
+            schema: 'agent-flow/v1',
+            metadata: { name: 'Untitled Flow' },
+            nodes: [], edges: [], runtime: { engine: 'agentcore' },
+          });
+          var nameEl = document.getElementById('flow-name-label');
+          if (nameEl) nameEl.textContent = 'Untitled Flow';
+        }
+      }
+    });
+
     document.getElementById('fom-clear-all').addEventListener('click', function () {
       closeFlowMenu();
       if (!confirm('Clear all nodes and edges from the canvas?')) return;
