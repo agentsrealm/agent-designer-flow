@@ -112,6 +112,22 @@
       </div>
     </div>
 
+    <!-- AI Companion popover -->
+    <div id="ai-companion-backdrop" class="ai-companion-backdrop hidden" aria-hidden="true"></div>
+    <div id="ai-companion-popover" class="ai-companion-popover hidden" role="dialog" aria-modal="true" aria-labelledby="ai-companion-title">
+      <div class="ai-companion-panel">
+        <header class="ai-companion-header">
+          <div>
+            <div class="ai-companion-eyebrow" id="ai-companion-step">Step 1 of 3</div>
+            <h2 id="ai-companion-title" class="ai-companion-title">Choose intent</h2>
+          </div>
+          <button type="button" class="btn-icon" id="ai-companion-close" title="Close">✕</button>
+        </header>
+        <div id="ai-companion-body" class="ai-companion-body"></div>
+        <footer id="ai-companion-footer" class="ai-companion-footer"></footer>
+      </div>
+    </div>
+
     <!-- Context Menu -->
     <div id="context-menu" class="hidden">
       <ul id="context-menu-list"></ul>
@@ -168,6 +184,8 @@
   <script src="js/flow-tabs.js"></script>
   <script src="js/entity-picker.js"></script>
   <script src="js/validation.js"></script>
+  <script src="js/agent-capabilities-catalog.js"></script>
+  <script src="js/ai-companion.js"></script>
   <script src="js/embed.js"></script>
   <script src="js/app.js"></script>
 </body>

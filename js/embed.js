@@ -136,6 +136,9 @@ window.AF = window.AF || {};
     if (msg.type === 'FLOW_SUBFLOWS_CATALOG' && AF.subflowsCatalog) {
       AF.subflowsCatalog.setCatalog(msg.payload);
     }
+    if (msg.type === 'FLOW_AGENT_CAPABILITIES' && AF.agentCapabilities) {
+      AF.agentCapabilities.setCatalog(msg.payload);
+    }
   });
 
   AF.embed = {
