@@ -92,6 +92,9 @@ window.AF = window.AF || {};
     if (msg.type === 'FLOW_AGENTS_CATALOG' && AF.agentsCatalog) {
       AF.agentsCatalog.setCatalog(msg.payload);
     }
+    if (msg.type === 'FLOW_SUBFLOWS_CATALOG' && AF.subflowsCatalog) {
+      AF.subflowsCatalog.setCatalog(msg.payload);
+    }
   });
 
   AF.embed = {

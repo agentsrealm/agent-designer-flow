@@ -20,6 +20,7 @@ AF.createRuntimeCatalog = function (opts) {
       : Array.isArray(data.tools) ? data.tools
       : Array.isArray(data.skills) ? data.skills
       : Array.isArray(data.agents) ? data.agents
+      : Array.isArray(data.subflows) ? data.subflows
       : [];
     return {
       schema: data.schema || opts.schema,
@@ -124,7 +125,7 @@ AF.createRuntimeCatalog = function (opts) {
       var q = (query || '').trim().toLowerCase();
       var tools = _catalog.tools || [];
       if (!q) return tools.slice();
-      var fields = ['displayName', 'name', 'description', 'pluginName', 'category', 'role', 'model', 'agentType', 'version'];
+      var fields = ['displayName', 'name', 'description', 'pluginName', 'category', 'role', 'model', 'agentType', 'version', 'nodeCount'];
       if (extraFields) fields = fields.concat(extraFields);
       return tools.filter(function (t) {
         return fields.some(function (f) {

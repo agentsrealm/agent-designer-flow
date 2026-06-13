@@ -35,6 +35,9 @@ AF.validateFlow = function () {
     if (node.type === 'skill' && node.category === 'work' && !p.skillId && !p.skillName)
       results.push({ severity:'warning', msg:'Skill "'+node.label+'" has no skill selected.', nodeId:node.id });
 
+    if (node.type === 'subflow' && !p.subflowId && !p.flowId && !p.flowRef)
+      results.push({ severity:'warning', msg:'Subflow "'+node.label+'" has no subflow selected.', nodeId:node.id });
+
     if (node.type === 'task' && !p.assignedAgent)
       results.push({ severity:'error', msg:'Task "'+node.label+'" must have an assigned agent.', nodeId:node.id });
 

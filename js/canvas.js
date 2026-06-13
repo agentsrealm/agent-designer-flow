@@ -272,6 +272,17 @@ function bindNodeInteractions() {
       detail:{ cx:e.clientX, cy:e.clientY, type:'node', id:nodeEl.dataset.nodeId }
     }));
   });
+
+  _canvas.addEventListener('dblclick', function (e) {
+    var nodeEl = e.target.closest('.canvas-node');
+    if (!nodeEl) return;
+    var node = AF.store.getNode(nodeEl.dataset.nodeId);
+    if (node && node.type === 'subflow' && AF.flowTabs) {
+      e.preventDefault();
+      e.stopPropagation();
+      AF.flowTabs.openFromNode(node);
+    }
+  });
 }
 
 /* ── Sync store → DOM ── */

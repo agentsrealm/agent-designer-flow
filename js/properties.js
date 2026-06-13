@@ -62,6 +62,7 @@ function buildTabContent(tab, node, def) {
     case 'Select Tool':  return buildToolSelectTab(node, p);
     case 'Select Skill': return buildSkillSelectTab(node, p);
     case 'Select Agent': return buildAgentSelectTab(node, p);
+    case 'Select Subflow': return buildSubflowSelectTab(node, p);
     case 'General':      return buildGeneralTab(node, p);
     case 'Prompt':       return buildPromptTab(p);
     case 'Model':        return buildModelTab(p);
@@ -179,6 +180,32 @@ function buildAgentSelectTab(node, p) {
     + '</div>';
 }
 
+function buildSubflowSelectTab(node, p) {
+  var selected = p.subflowId || p.flowId || p.flowRef;
+  var sf = selected && AF.subflowsCatalog ? AF.subflowsCatalog.findById(selected) : null;
+  var display = p.subflowDisplayName || p.flowRef || '';
+  var meta = [p.version ? 'v' + p.version : '', sf && sf.nodeCount ? sf.nodeCount + ' nodes' : ''].filter(Boolean).join(' · ');
+  var desc = p.subflowDescription || (sf && sf.description) || '';
+
+  var selectedBlock = selected
+    ? '<div class="tool-selected-card">'
+      + '<div class="tool-selected-head"><span class="tool-selected-icon">📦</span>'
+      + '<div><div class="tool-selected-name">' + esc(display) + '</div>'
+      + '<div class="tool-selected-meta">' + esc(meta) + (p.subflowName ? ' · ' + esc(p.subflowName) : '') + '</div></div></div>'
+      + (desc ? '<div class="tool-selected-desc">' + esc(desc) + '</div>' : '')
+      + '</div>'
+    : '<div class="tool-selected-empty">No subflow selected yet.</div>';
+
+  return '<div class="tool-select-panel">'
+    + '<p class="tool-select-hint">Choose a nested flow from the host application. Double-click the node on the canvas to open it in a new tab.</p>'
+    + selectedBlock
+    + '<button type="button" class="btn-primary tool-select-btn" data-action="open-subflow-picker">'
+    + (selected ? 'Change subflow…' : 'Select subflow…')
+    + '</button>'
+    + (selected ? '<button type="button" class="btn-outline tool-select-btn" style="margin-top:8px" data-action="open-subflow-tab">Open in new tab</button>' : '')
+    + '</div>';
+}
+
 function buildGeneralTab(node, p) {
   var t = node.type, extra = '';
   if (t === 'start')           extra = field('Trigger Type', sel('trigger', p.trigger, ['chat','api','schedule','event','webhook']));
@@ -190,7 +217,7 @@ function buildGeneralTab(node, p) {
   else if (t==='tool-call')    extra = field('Call Type', sel('callType',p.callType||'mcp',['mcp','api'])) + field('Server / Endpoint', inp('serverUrl',p.serverUrl||'','mcp://... or https://...')) + field('Tool Name', inp('toolName',p.toolName||'','e.g. search_documents'));
   else if (t==='skill')        extra = isWorkSkillNode(node) ? '' : field('Skill ID', inp('skillId',p.skillId||'','Unique skill identifier')) + field('Description', ta('description',p.description||'','What this reusable skill does',2)) + field('Version', inp('version',p.version||'1.0',''));
   else if (isWorkAgentNode(node)) extra = '';
-  else if (t==='subflow')      extra = field('Flow Reference', inp('flowRef',p.flowRef||'','Flow name or path')) + field('Flow ID', inp('flowId',p.flowId||'','Nested flow ID')) + field('Description', ta('description',p.description||'','',2)) + tog('Run Async','async',p.async);
+  else if (t==='subflow')      extra = '';
   else if (t==='api-task')     extra = field('Method', sel('method',p.method,['GET','POST','PUT','PATCH','DELETE'])) + field('URL', inp('url',p.url,'https://...'));
   else if (t==='human-approval') extra = field('Approval Question', ta('approvalQuestion',p.approvalQuestion,'What should the approver decide?',3));
   else if (t==='notification') extra = field('Channel', sel('channel',p.channel,['slack','email','teams','webhook','sms'])) + field('Recipient', inp('recipient',p.recipient,'#channel or email'));
@@ -468,6 +495,14 @@ function handleAction(action, node) {
   }
   if (action==='open-agent-picker') {
     AF.entityPicker.open({ kind: 'agent', nodeId: node.id });
+    return;
+  }
+  if (action==='open-subflow-picker') {
+    AF.entityPicker.open({ kind: 'subflow', nodeId: node.id });
+    return;
+  }
+  if (action==='open-subflow-tab') {
+    if (AF.flowTabs) AF.flowTabs.openFromNode(node);
     return;
   }
   if (action==='add-tool') {

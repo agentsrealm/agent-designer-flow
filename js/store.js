@@ -128,6 +128,17 @@ window.AF = window.AF || {};
       emit('nodes'); emit('edges'); emit('import');
     },
 
+    /** Swap canvas content without undo history (flow tab switches). */
+    replaceFlow(data) {
+      _state.flowName = (data.metadata && data.metadata.name) || _state.flowName;
+      _state.nodes = JSON.parse(JSON.stringify(data.nodes || []));
+      _state.edges = JSON.parse(JSON.stringify(data.edges || []));
+      var ids = _state.nodes.map(function (n) { return parseInt(String(n.id).replace('node_', ''), 10) || 0; });
+      _state._counter = (ids.length ? Math.max.apply(null, ids) : 0) + 1;
+      AF.store.deselect();
+      emit('nodes'); emit('edges'); emit('import');
+    },
+
     on(event, fn) {
       _listeners.push({ event, fn });
       return function () { _listeners = _listeners.filter(l => l.fn !== fn); };

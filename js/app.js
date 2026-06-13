@@ -9,6 +9,8 @@ window.AF = window.AF || {};
   AF.toolsCatalog.init();
   AF.skillsCatalog.init();
   AF.agentsCatalog.init();
+  AF.subflowsCatalog.init();
+  AF.flowTabs.init();
   AF.entityPicker.init();
   bindTopbar();
   bindContextMenu();
@@ -132,6 +134,11 @@ window.AF = window.AF || {};
       menuList.innerHTML = '';
 
       if (type === 'node') {
+        var node = AF.store.getNode(id);
+        if (node && node.type === 'subflow' && AF.flowTabs) {
+          addItem('📦  Open Subflow', function () { AF.flowTabs.openFromNode(node); });
+          addSep();
+        }
         addItem('✏️  Rename',    function(){ renameNode(id); });
         addItem('📋  Duplicate', function(){ duplicateNode(id); });
         addSep();
@@ -265,8 +272,23 @@ window.AF = window.AF || {};
           },
         },
         {
-          id: 'node_5', type: 'end', category: 'end', label: 'End', icon: '⏹',
-          x: 940, y: 200,
+          id: 'node_5', type: 'subflow', category: 'work', label: 'Ticket Triage', icon: '📦',
+          x: 960, y: 200,
+          props: {
+            name: 'Ticket Triage',
+            subflowId: 'sf_ticket_triage',
+            subflowName: 'ticket_triage',
+            subflowDisplayName: 'Ticket Triage',
+            subflowDescription: 'Classify incoming tickets and route to the correct queue.',
+            flowId: 'sf_ticket_triage',
+            flowRef: 'ticket_triage',
+            version: '1.0',
+            inputMapping: '', outputMapping: '', async: false, outputKey: 'result',
+          },
+        },
+        {
+          id: 'node_6', type: 'end', category: 'end', label: 'End', icon: '⏹',
+          x: 1180, y: 200,
           props: { name: 'End', outputSchema: '', returnFormat: 'json' },
         },
       ],
@@ -275,9 +297,11 @@ window.AF = window.AF || {};
         { id: 'edge_2', source: 'node_2', target: 'node_3', type: 'control', label: '' },
         { id: 'edge_3', source: 'node_3', target: 'node_4', type: 'control', label: '' },
         { id: 'edge_4', source: 'node_4', target: 'node_5', type: 'control', label: '' },
+        { id: 'edge_5', source: 'node_5', target: 'node_6', type: 'control', label: '' },
       ],
       runtime: { engine: 'agentcore' },
     });
     document.getElementById('flow-name-label').textContent = 'Work Items Demo';
+    if (AF.flowTabs) AF.flowTabs.registerRoot();
   }
 })();

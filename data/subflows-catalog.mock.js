@@ -1,0 +1,186 @@
+/* data/subflows-catalog.mock.js */
+window.AF = window.AF || {};
+
+AF.MOCK_SUBFLOWS_CATALOG = {
+  "schema": "agent-subflows/v1",
+  "source": "mock",
+  "updatedAt": "2026-06-12T00:00:00Z",
+  "subflows": [
+    {
+      "id": "sf_ticket_triage",
+      "name": "ticket_triage",
+      "displayName": "Ticket Triage",
+      "description": "Classify incoming tickets and route to the correct queue.",
+      "version": "1.0",
+      "nodeCount": 3,
+      "flow": {
+        "schema": "agent-flow/v1",
+        "metadata": {
+          "name": "Ticket Triage"
+        },
+        "nodes": [
+          {
+            "id": "sf1_n1",
+            "type": "start",
+            "category": "start",
+            "label": "Start",
+            "icon": "▶",
+            "x": 80,
+            "y": 120,
+            "props": {
+              "name": "Start",
+              "trigger": "api",
+              "userContext": false
+            }
+          },
+          {
+            "id": "sf1_n2",
+            "type": "skill",
+            "category": "work",
+            "label": "Classify Intent",
+            "icon": "♻",
+            "x": 320,
+            "y": 120,
+            "props": {
+              "name": "Classify Intent",
+              "skillId": "classify_intent",
+              "skillDisplayName": "Classify Intent",
+              "version": "2.1"
+            }
+          },
+          {
+            "id": "sf1_n3",
+            "type": "end",
+            "category": "end",
+            "label": "End",
+            "icon": "⏹",
+            "x": 560,
+            "y": 120,
+            "props": {
+              "name": "End",
+              "returnFormat": "json"
+            }
+          }
+        ],
+        "edges": [
+          {
+            "id": "sf1_e1",
+            "source": "sf1_n1",
+            "target": "sf1_n2",
+            "type": "control",
+            "label": ""
+          },
+          {
+            "id": "sf1_e2",
+            "source": "sf1_n2",
+            "target": "sf1_n3",
+            "type": "control",
+            "label": ""
+          }
+        ],
+        "runtime": {
+          "engine": "agentcore"
+        }
+      }
+    },
+    {
+      "id": "sf_escalation",
+      "name": "escalation_handler",
+      "displayName": "Escalation Handler",
+      "description": "Escalate unresolved issues to a human approver and notify stakeholders.",
+      "version": "1.1",
+      "nodeCount": 4,
+      "flow": {
+        "schema": "agent-flow/v1",
+        "metadata": {
+          "name": "Escalation Handler"
+        },
+        "nodes": [
+          {
+            "id": "sf2_n1",
+            "type": "start",
+            "category": "start",
+            "label": "Start",
+            "icon": "▶",
+            "x": 60,
+            "y": 140,
+            "props": {
+              "name": "Start",
+              "trigger": "event",
+              "userContext": true
+            }
+          },
+          {
+            "id": "sf2_n2",
+            "type": "agent",
+            "category": "work",
+            "label": "Escalation Agent",
+            "icon": "🤖",
+            "x": 280,
+            "y": 140,
+            "props": {
+              "name": "Escalation Agent",
+              "agentRefId": "agent_escalation",
+              "agentDisplayName": "Escalation Agent",
+              "role": "Escalation Manager"
+            }
+          },
+          {
+            "id": "sf2_n3",
+            "type": "human-approval",
+            "category": "work",
+            "label": "Manager Approval",
+            "icon": "👤",
+            "x": 500,
+            "y": 140,
+            "props": {
+              "name": "Manager Approval",
+              "approverRole": "Manager",
+              "approvalQuestion": "Approve escalation?",
+              "timeout": 3600
+            }
+          },
+          {
+            "id": "sf2_n4",
+            "type": "end",
+            "category": "end",
+            "label": "End",
+            "icon": "⏹",
+            "x": 720,
+            "y": 140,
+            "props": {
+              "name": "End",
+              "returnFormat": "json"
+            }
+          }
+        ],
+        "edges": [
+          {
+            "id": "sf2_e1",
+            "source": "sf2_n1",
+            "target": "sf2_n2",
+            "type": "control",
+            "label": ""
+          },
+          {
+            "id": "sf2_e2",
+            "source": "sf2_n2",
+            "target": "sf2_n3",
+            "type": "control",
+            "label": ""
+          },
+          {
+            "id": "sf2_e3",
+            "source": "sf2_n3",
+            "target": "sf2_n4",
+            "type": "approval",
+            "label": "approved"
+          }
+        ],
+        "runtime": {
+          "engine": "agentcore"
+        }
+      }
+    }
+  ]
+};

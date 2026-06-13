@@ -77,8 +77,8 @@ AF.NODE_GROUPS = [
       },
       {
         type: 'subflow', label: 'Subflow', icon: '📦', category: 'work',
-        defaultProps: { name: 'Subflow', flowRef: '', flowId: '', description: '', inputMapping: '', outputMapping: '', async: false, outputKey: 'result' },
-        tabs: ['General', 'I/O', 'Output']
+        defaultProps: { name: 'Subflow', subflowId: '', subflowName: '', subflowDisplayName: '', subflowDescription: '', flowRef: '', flowId: '', version: '1.0', inputMapping: '', outputMapping: '', async: false, outputKey: 'result' },
+        tabs: ['Select Subflow']
       },
       {
         type: 'agent', label: 'Agent', icon: '🤖', category: 'work',

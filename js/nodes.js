@@ -15,7 +15,7 @@ var BODY_FIELDS = {
   'tool-task':       ['toolDisplayName','pluginName'],
   'tool-call':       ['callType','toolName'],
   'skill':           ['skillDisplayName','version'],
-  'subflow':         ['flowRef','flowId'],
+  'subflow':         ['subflowDisplayName','version'],
   'api-task':        ['method','url'],
   'rag-task':        ['searchType','topK'],
   'human-approval':  ['approverRole','timeout'],
@@ -90,6 +90,14 @@ AF.buildNodeEl = function (node) {
       + '</div>';
   }
 
+  if (node.type === 'subflow') {
+    var hasRef = node.props && (node.props.subflowId || node.props.flowId || node.props.flowRef);
+    if (hasRef) {
+      el.classList.add('subflow-openable');
+      el.title = 'Double-click to open subflow in a new tab';
+    }
+  }
+
   return el;
 };
 
@@ -109,6 +117,11 @@ AF.updateNodeEl = function (el, node) {
     var fields = BODY_FIELDS[node.type] || [];
     el.querySelector('.nh-title').textContent = node.label;
     el.querySelector('.node-body').innerHTML  = renderBody(fields, node.props);
+  }
+  if (node.type === 'subflow') {
+    var hasRef = node.props && (node.props.subflowId || node.props.flowId || node.props.flowRef);
+    el.classList.toggle('subflow-openable', !!hasRef);
+    el.title = hasRef ? 'Double-click to open subflow in a new tab' : '';
   }
 };
 

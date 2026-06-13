@@ -84,6 +84,22 @@
   box-shadow: 0 12px 32px rgba(0,0,0,0.6);
 }
 
+.canvas-node.subflow-openable .node-main {
+  cursor: pointer;
+}
+
+.canvas-node.subflow-openable .node-header {
+  position: relative;
+}
+
+.canvas-node.subflow-openable .node-header::after {
+  content: '↗';
+  margin-left: auto;
+  font-size: 10px;
+  color: var(--text-muted);
+  opacity: 0.7;
+}
+
 /* ── Node Header ── */
 .node-header {
   display: flex;

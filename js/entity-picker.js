@@ -42,6 +42,19 @@ window.AF = window.AF || {};
       noneText: 'No agents found',
       idAttr: 'data-item-id',
     },
+    subflow: {
+      catalog: function () { return AF.subflowsCatalog; },
+      request: function () { AF.subflowsCatalog.requestFromHost(); },
+      readyEvent: 'af-subflows-catalog-ready',
+      updatedEvent: 'af-subflows-catalog-updated',
+      icon: '📦',
+      title: 'Select subflow',
+      subtitle: 'Reusable nested flows from the host application',
+      placeholder: 'Search subflows by name or description…',
+      emptyText: 'No subflows match your search.',
+      noneText: 'No subflows found',
+      idAttr: 'data-item-id',
+    },
   };
 
   var _modal, _titleEl, _subtitleEl, _listEl, _searchEl, _pageInfo, _prevBtn, _nextBtn, _emptyEl;
@@ -60,6 +73,7 @@ window.AF = window.AF || {};
   function rowMeta(item) {
     if (_kind === 'tool') return esc(item.pluginName) + ' · ' + esc(item.name);
     if (_kind === 'skill') return esc(item.category) + ' · v' + esc(item.version) + ' · ' + esc(item.name);
+    if (_kind === 'subflow') return 'v' + esc(item.version) + ' · ' + esc(item.nodeCount) + ' nodes · ' + esc(item.name);
     return esc(item.role) + ' · ' + esc(item.model) + ' · ' + esc(item.name);
   }
 
