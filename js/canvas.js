@@ -296,8 +296,15 @@ function syncNodes() {
 
   nodes.forEach(function (node) {
     var el = document.getElementById(node.id);
-    if (!el) { el = AF.buildNodeEl(node); _canvas.appendChild(el); }
-    else      { AF.updateNodeEl(el, node); }
+    if (!el) {
+      el = AF.buildNodeEl(node); _canvas.appendChild(el);
+    } else if (el.dataset.type !== node.type) {
+      var newEl = AF.buildNodeEl(node);
+      _canvas.replaceChild(newEl, el);
+      el = newEl;
+    } else {
+      AF.updateNodeEl(el, node);
+    }
     el.classList.toggle('selected',
       AF.store.get('selectedId') === node.id && AF.store.get('selectedType') === 'node');
   });

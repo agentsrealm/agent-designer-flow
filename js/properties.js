@@ -128,6 +128,9 @@ function buildToolSelectTab(node, p) {
     + '<button type="button" class="btn-primary tool-select-btn" data-action="open-tool-picker">'
     + (selected ? 'Change tool…' : 'Select tool…')
     + '</button>'
+    + '<button type="button" class="btn-outline tool-select-btn mock-it-btn" style="margin-top:8px" data-action="swap-to-mock-task">'
+    + '⚠️ Swap with a mock…'
+    + '</button>'
     + '</div>';
 }
 
@@ -528,6 +531,14 @@ function handleAction(action, node) {
       kind: 'tool',
       nodeId: node.id,
       typeOverride: 'tool-task',
+    });
+    return;
+  }
+  if (action==='swap-to-mock-task') {
+    AF.entityPicker.open({
+      kind: 'mock-tool',
+      nodeId: node.id,
+      typeOverride: 'mock-task',
     });
     return;
   }

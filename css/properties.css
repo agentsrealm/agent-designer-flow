@@ -380,6 +380,22 @@ body.theme-light #properties-content::-webkit-scrollbar-thumb:hover { background
   line-height: 1.45;
 }
 .mock-selected-card { border-color: rgba(243,156,18,0.5); }
+.convert-live-btn {
+  border-color: #b8860b !important;
+  color: #b8860b !important;
+}
+.convert-live-btn:hover {
+  background: rgba(184,134,11,0.08) !important;
+}
+.mock-it-btn {
+  border-color: #b8860b !important;
+  color: #b8860b !important;
+  opacity: 0.75;
+}
+.mock-it-btn:hover {
+  background: rgba(184,134,11,0.08) !important;
+  opacity: 1;
+}
 .mock-prefix {
   display: inline-block;
   font-size: 9px;

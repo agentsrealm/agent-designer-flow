@@ -74,6 +74,7 @@ window.AF = window.AF || {};
   var _kind = null;
   var _cfg = null;
   var _nodeId = null;
+  var _typeOverride = null;
   var _query = '';
   var _page = 1;
   var _onSelect = null;
@@ -128,10 +129,23 @@ window.AF = window.AF || {};
         if (!item) return;
         if (_onSelect) _onSelect(item);
         if (_nodeId) {
-          AF.store.updateNode(_nodeId, {
+          var patch = {
             label: item.displayName || item.name,
             props: catalog.propsFromItem(item),
-          });
+          };
+          if (_typeOverride) {
+            patch.type = _typeOverride;
+            var iconDef = null;
+            if (AF.NODE_GROUPS) {
+              AF.NODE_GROUPS.forEach(function (g) {
+                g.items.forEach(function (it) {
+                  if (it.type === _typeOverride) iconDef = it;
+                });
+              });
+            }
+            if (iconDef) patch.icon = iconDef.icon;
+          }
+          AF.store.updateNode(_nodeId, patch);
         }
         AF.entityPicker.close();
       });
@@ -208,6 +222,7 @@ window.AF = window.AF || {};
       if (!_cfg) return;
 
       _nodeId = opts.nodeId || null;
+      _typeOverride = opts.typeOverride || null;
       _onSelect = opts.onSelect || null;
       _query = '';
       _page = 1;
@@ -231,6 +246,7 @@ window.AF = window.AF || {};
       _kind = null;
       _cfg = null;
       _nodeId = null;
+      _typeOverride = null;
       _onSelect = null;
     },
   };
