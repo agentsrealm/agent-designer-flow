@@ -13,7 +13,7 @@ window.AF = window.AF || {};
   bindTopbar();
   bindContextMenu();
   bindImportExport();
-  loadStarterFlow();
+  if (!AF.embed || !AF.embed.isEmbed) loadStarterFlow();
   if (AF.embed && AF.embed.isEmbed) AF.embed.postReady();
 
   /* ── Topbar ── */
@@ -209,34 +209,75 @@ window.AF = window.AF || {};
     });
   }
 
-  /* ── Starter demo flow ── */
+  /* ── Starter demo flow — work items (Agent, Skill, Tool Task) ── */
   function loadStarterFlow() {
     AF.store.importJSON({
       schema: 'agent-flow/v1',
-      metadata: { name: 'Customer Support Flow' },
+      metadata: { name: 'Work Items Demo' },
       nodes: [
-        { id:'node_1', type:'start',          category:'start',   label:'Start',            icon:'▶', x:60,  y:80,  props:{ trigger:'chat', userContext:true } },
-        { id:'node_2', type:'router',          category:'agent',   label:'Intent Router',    icon:'↗', x:320, y:80,  props:{ name:'Router', routingStrategy:'intent', confidenceThreshold:0.75, model:'claude-haiku-4-5-20251001', routes:[{label:'Billing',condition:'intent == "billing"'},{label:'Technical',condition:'intent == "technical"'}], fallbackRoute:'' } },
-        { id:'node_3', type:'agent',           category:'agent',   label:'Billing Agent',    icon:'🤖',x:120, y:280, props:{ name:'Billing Agent', role:'Billing Specialist', goal:'Resolve billing inquiries', model:'claude-sonnet-4-6', temperature:0.5, tools:['lookup_invoice','refund_tool'], memoryScope:'session' } },
-        { id:'node_4', type:'agent',           category:'agent',   label:'Support Agent',    icon:'🤖',x:520, y:280, props:{ name:'Support Agent', role:'Technical Support', goal:'Resolve technical issues', model:'claude-sonnet-4-6', temperature:0.7, tools:['search_docs','create_ticket'], memoryScope:'session' } },
-        { id:'node_5', type:'human-approval',  category:'work',    label:'Manager Approval', icon:'👤',x:120, y:480, props:{ name:'Manager Approval', approverRole:'Manager', approvalQuestion:'Approve refund?', timeout:3600 } },
-        { id:'node_6', type:'decision',        category:'control', label:'Resolved?',        icon:'⑂', x:520, y:480, props:{ name:'Resolved?', conditionType:'expression', condition:'resolved == true', branches:[{label:'Yes',condition:'resolved == true'},{label:'No',condition:'resolved == false'}], fallbackBranch:'No' } },
-        { id:'node_7', type:'notification',    category:'work',    label:'Send Summary',     icon:'🔔',x:320, y:680, props:{ name:'Send Summary', channel:'email', recipient:'{{user.email}}', message:'Your issue has been resolved.', onSuccess:true, onFailure:false } },
-        { id:'node_8', type:'end',             category:'end',     label:'End',              icon:'⏹', x:320, y:860, props:{ name:'End', returnFormat:'json' } },
+        {
+          id: 'node_1', type: 'start', category: 'start', label: 'Start', icon: '▶',
+          x: 60, y: 200,
+          props: { name: 'Start', trigger: 'chat', userContext: true, tenantContext: false },
+        },
+        {
+          id: 'node_2', type: 'agent', category: 'work', label: 'Support Agent', icon: '🤖',
+          x: 280, y: 200,
+          props: {
+            name: 'Support Agent',
+            agentRefId: 'agent_support',
+            agentRefName: 'support-agent',
+            agentDisplayName: 'Support Agent',
+            agentDescription: 'Resolves technical issues using docs and tickets.',
+            role: 'Technical Support',
+            model: 'claude-sonnet-4-6',
+            agentType: 'specialist',
+            instructions: '', temperature: 0.7, maxTokens: 4096, maxIterations: 10, timeout: 120,
+            tools: [], knowledgeBases: [], memoryScope: 'session', fallbackAgent: '',
+          },
+        },
+        {
+          id: 'node_3', type: 'skill', category: 'work', label: 'Classify Intent', icon: '♻',
+          x: 500, y: 200,
+          props: {
+            name: 'Classify Intent',
+            skillId: 'classify_intent',
+            skillName: 'classify_intent',
+            skillDisplayName: 'Classify Intent',
+            skillDescription: 'Route user messages to the correct workflow intent.',
+            version: '2.1',
+            category: 'routing',
+            parameters: '', inputVars: [], outputVars: [], outputKey: 'result',
+          },
+        },
+        {
+          id: 'node_4', type: 'tool-task', category: 'work', label: 'Search Jira Issues', icon: '🔧',
+          x: 720, y: 200,
+          props: {
+            name: 'Search Jira Issues',
+            toolId: 'jira_search_issues',
+            toolName: 'jira_search_issues',
+            toolDisplayName: 'Search Jira Issues',
+            toolDescription: 'Run JQL queries and return matching issues.',
+            pluginId: 'atlassian-mcp-plugin',
+            pluginName: 'Atlassian MCP',
+            endpoint: '', auth: 'oauth2',
+          },
+        },
+        {
+          id: 'node_5', type: 'end', category: 'end', label: 'End', icon: '⏹',
+          x: 940, y: 200,
+          props: { name: 'End', outputSchema: '', returnFormat: 'json' },
+        },
       ],
       edges: [
-        { id:'edge_1', source:'node_1', target:'node_2', type:'control',  label:'' },
-        { id:'edge_2', source:'node_2', target:'node_3', type:'delegate', label:'billing' },
-        { id:'edge_3', source:'node_2', target:'node_4', type:'delegate', label:'technical' },
-        { id:'edge_4', source:'node_3', target:'node_5', type:'approval', label:'refund?' },
-        { id:'edge_5', source:'node_4', target:'node_6', type:'control',  label:'' },
-        { id:'edge_6', source:'node_5', target:'node_7', type:'control',  label:'approved' },
-        { id:'edge_7', source:'node_6', target:'node_7', type:'control',  label:'yes' },
-        { id:'edge_8', source:'node_6', target:'node_4', type:'fallback', label:'retry' },
-        { id:'edge_9', source:'node_7', target:'node_8', type:'control',  label:'' },
+        { id: 'edge_1', source: 'node_1', target: 'node_2', type: 'control', label: '' },
+        { id: 'edge_2', source: 'node_2', target: 'node_3', type: 'control', label: '' },
+        { id: 'edge_3', source: 'node_3', target: 'node_4', type: 'control', label: '' },
+        { id: 'edge_4', source: 'node_4', target: 'node_5', type: 'control', label: '' },
       ],
-      runtime: { engine:'agentcore' },
+      runtime: { engine: 'agentcore' },
     });
-    document.getElementById('flow-name-label').textContent = 'Customer Support Flow';
+    document.getElementById('flow-name-label').textContent = 'Work Items Demo';
   }
 })();
