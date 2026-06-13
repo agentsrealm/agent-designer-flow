@@ -14,7 +14,7 @@ var BODY_FIELDS = {
   'llm-task':        ['model','temperature'],
   'tool-task':       ['toolDisplayName','pluginName'],
   'tool-call':       ['callType','toolName'],
-  'skill':           ['skillId','version'],
+  'skill':           ['skillDisplayName','version'],
   'subflow':         ['flowRef','flowId'],
   'api-task':        ['method','url'],
   'rag-task':        ['searchType','topK'],

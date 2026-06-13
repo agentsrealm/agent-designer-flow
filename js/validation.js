@@ -26,8 +26,14 @@ AF.validateFlow = function () {
     if (!conns.length && node.type !== 'start' && node.type !== 'end')
       results.push({ severity:'warning', msg:'"'+node.label+'" has no connections.', nodeId:node.id });
 
-    if (agentTypes.indexOf(node.type) !== -1 && !p.model)
+    if (agentTypes.indexOf(node.type) !== -1 && node.category !== 'work' && !p.model)
       results.push({ severity:'error', msg:'Agent "'+node.label+'" must have a model selected.', nodeId:node.id });
+
+    if (node.type === 'agent' && node.category === 'work' && !p.agentRefId && !p.agentRefName)
+      results.push({ severity:'warning', msg:'Agent "'+node.label+'" has no agent selected.', nodeId:node.id });
+
+    if (node.type === 'skill' && node.category === 'work' && !p.skillId && !p.skillName)
+      results.push({ severity:'warning', msg:'Skill "'+node.label+'" has no skill selected.', nodeId:node.id });
 
     if (node.type === 'task' && !p.assignedAgent)
       results.push({ severity:'error', msg:'Task "'+node.label+'" must have an assigned agent.', nodeId:node.id });

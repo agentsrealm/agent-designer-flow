@@ -92,7 +92,8 @@ function bindDrop() {
     e.preventDefault();
     var type = e.dataTransfer.getData('node-type');
     if (!type) return;
-    var def = AF.getItemDef(type);
+    var category = e.dataTransfer.getData('node-category');
+    var def = AF.getItemDef(type, category) || AF.getItemDef(type);
     if (!def) return;
 
     var rect = _canvasContainer.getBoundingClientRect();

@@ -18,7 +18,7 @@ function renderPanel() {
   var node = AF.store.getNode(id);
   if (!node)         { showEmpty(); return; }
 
-  var def  = AF.getItemDef(node.type) || {};
+  var def  = AF.getItemDef(node.type, node.category) || {};
   var tabs = def.tabs || ['General'];
 
   showContent();
@@ -60,6 +60,8 @@ function buildTabContent(tab, node, def) {
   var p = node.props;
   switch (tab) {
     case 'Select Tool':  return buildToolSelectTab(node, p);
+    case 'Select Skill': return buildSkillSelectTab(node, p);
+    case 'Select Agent': return buildAgentSelectTab(node, p);
     case 'General':      return buildGeneralTab(node, p);
     case 'Prompt':       return buildPromptTab(p);
     case 'Model':        return buildModelTab(p);
@@ -127,16 +129,67 @@ function buildToolSelectTab(node, p) {
     + '</div>';
 }
 
+function buildSkillSelectTab(node, p) {
+  var selected = p.skillId || p.skillName;
+  var skill = selected && AF.skillsCatalog ? AF.skillsCatalog.findById(selected) : null;
+  var display = p.skillDisplayName || p.skillName || '';
+  var meta = [p.category, p.version ? 'v' + p.version : ''].filter(Boolean).join(' · ');
+  var desc = p.skillDescription || (skill && skill.description) || '';
+
+  var selectedBlock = selected
+    ? '<div class="tool-selected-card">'
+      + '<div class="tool-selected-head"><span class="tool-selected-icon">♻</span>'
+      + '<div><div class="tool-selected-name">' + esc(display) + '</div>'
+      + '<div class="tool-selected-meta">' + esc(meta) + (p.skillName ? ' · ' + esc(p.skillName) : '') + '</div></div></div>'
+      + (desc ? '<div class="tool-selected-desc">' + esc(desc) + '</div>' : '')
+      + '</div>'
+    : '<div class="tool-selected-empty">No skill selected yet.</div>';
+
+  return '<div class="tool-select-panel">'
+    + '<p class="tool-select-hint">Choose a reusable skill from the host application.</p>'
+    + selectedBlock
+    + '<button type="button" class="btn-primary tool-select-btn" data-action="open-skill-picker">'
+    + (selected ? 'Change skill…' : 'Select skill…')
+    + '</button>'
+    + '</div>';
+}
+
+function buildAgentSelectTab(node, p) {
+  var selected = p.agentRefId || p.agentRefName;
+  var agent = selected && AF.agentsCatalog ? AF.agentsCatalog.findById(selected) : null;
+  var display = p.agentDisplayName || p.agentRefName || '';
+  var meta = [p.role, p.model].filter(Boolean).join(' · ');
+  var desc = p.agentDescription || (agent && agent.description) || '';
+
+  var selectedBlock = selected
+    ? '<div class="tool-selected-card">'
+      + '<div class="tool-selected-head"><span class="tool-selected-icon">🤖</span>'
+      + '<div><div class="tool-selected-name">' + esc(display) + '</div>'
+      + '<div class="tool-selected-meta">' + esc(meta) + (p.agentRefName ? ' · ' + esc(p.agentRefName) : '') + '</div></div></div>'
+      + (desc ? '<div class="tool-selected-desc">' + esc(desc) + '</div>' : '')
+      + '</div>'
+    : '<div class="tool-selected-empty">No agent selected yet.</div>';
+
+  return '<div class="tool-select-panel">'
+    + '<p class="tool-select-hint">Choose a registered agent from the host application.</p>'
+    + selectedBlock
+    + '<button type="button" class="btn-primary tool-select-btn" data-action="open-agent-picker">'
+    + (selected ? 'Change agent…' : 'Select agent…')
+    + '</button>'
+    + '</div>';
+}
+
 function buildGeneralTab(node, p) {
   var t = node.type, extra = '';
   if (t === 'start')           extra = field('Trigger Type', sel('trigger', p.trigger, ['chat','api','schedule','event','webhook']));
   else if (t === 'end')        extra = field('Return Format', sel('returnFormat', p.returnFormat, ['json','text','markdown']));
-  else if (isAgentType(t))     extra = field('Role', inp('role',p.role,"Describe the agent's role")) + field('Goal', inp('goal',p.goal,'What should this agent achieve?'));
+  else if (isAgentType(t) && !isWorkAgentNode(node)) extra = field('Role', inp('role',p.role,"Describe the agent's role")) + field('Goal', inp('goal',p.goal,'What should this agent achieve?'));
   else if (t==='task')         extra = field('Description', ta('description',p.description,'What does this task do?',3)) + field('Assigned Agent', inp('assignedAgent',p.assignedAgent,'Agent ID or name'));
   else if (t==='llm-task')     extra = field('Description', ta('description',p.description||'','',2)) + field('Assigned Agent', inp('assignedAgent',p.assignedAgent||'',''));
   else if (t==='tool-task')    extra = '';
   else if (t==='tool-call')    extra = field('Call Type', sel('callType',p.callType||'mcp',['mcp','api'])) + field('Server / Endpoint', inp('serverUrl',p.serverUrl||'','mcp://... or https://...')) + field('Tool Name', inp('toolName',p.toolName||'','e.g. search_documents'));
-  else if (t==='skill')        extra = field('Skill ID', inp('skillId',p.skillId||'','Unique skill identifier')) + field('Description', ta('description',p.description||'','What this reusable skill does',2)) + field('Version', inp('version',p.version||'1.0',''));
+  else if (t==='skill')        extra = isWorkSkillNode(node) ? '' : field('Skill ID', inp('skillId',p.skillId||'','Unique skill identifier')) + field('Description', ta('description',p.description||'','What this reusable skill does',2)) + field('Version', inp('version',p.version||'1.0',''));
+  else if (isWorkAgentNode(node)) extra = '';
   else if (t==='subflow')      extra = field('Flow Reference', inp('flowRef',p.flowRef||'','Flow name or path')) + field('Flow ID', inp('flowId',p.flowId||'','Nested flow ID')) + field('Description', ta('description',p.description||'','',2)) + tog('Run Async','async',p.async);
   else if (t==='api-task')     extra = field('Method', sel('method',p.method,['GET','POST','PUT','PATCH','DELETE'])) + field('URL', inp('url',p.url,'https://...'));
   else if (t==='human-approval') extra = field('Approval Question', ta('approvalQuestion',p.approvalQuestion,'What should the approver decide?',3));
@@ -406,7 +459,15 @@ function updateBranch(nodeId, idx, fld, val) {
 }
 function handleAction(action, node) {
   if (action==='open-tool-picker') {
-    AF.toolPicker.open({ nodeId: node.id });
+    AF.entityPicker.open({ kind: 'tool', nodeId: node.id });
+    return;
+  }
+  if (action==='open-skill-picker') {
+    AF.entityPicker.open({ kind: 'skill', nodeId: node.id });
+    return;
+  }
+  if (action==='open-agent-picker') {
+    AF.entityPicker.open({ kind: 'agent', nodeId: node.id });
     return;
   }
   if (action==='add-tool') {
@@ -475,6 +536,8 @@ function slider(prop, val, min, max, step) {
 }
 function esc(v) { return String(v||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function isAgentType(t) { return ['agent','sub-agent','supervisor','router','evaluator','planner','executor','critic'].indexOf(t)!==-1; }
+function isWorkAgentNode(node) { return node && node.type === 'agent' && node.category === 'work'; }
+function isWorkSkillNode(node) { return node && node.type === 'skill' && node.category === 'work'; }
 function iconBg(cat)    { return ({agent:'rgba(74,124,255,0.15)',work:'rgba(46,204,113,0.15)',infra:'rgba(155,89,182,0.15)',control:'rgba(243,156,18,0.15)',start:'rgba(26,188,156,0.15)',end:'rgba(231,76,60,0.15)'})[cat]||'rgba(139,149,176,0.15)'; }
 function iconColor(cat) { return ({agent:'#4a7cff',work:'#2ecc71',infra:'#9b59b6',control:'#f39c12',start:'#1abc9c',end:'#e74c3c'})[cat]||'#8b95b0'; }
 function fmtType(t)     { return t.replace(/-/g,' ').replace(/\b\w/g,function(c){return c.toUpperCase();}); }

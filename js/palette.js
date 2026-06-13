@@ -1,12 +1,19 @@
 /* js/palette.js — left panel, palette items, drag-from-palette */
 window.AF = window.AF || {};
 
-AF.getItemDef = function (type) {
+AF.getItemDef = function (type, category) {
+  var matches = [];
   for (var g of AF.NODE_GROUPS) {
-    var item = g.items.find(i => i.type === type);
-    if (item) return item;
+    for (var item of g.items) {
+      if (item.type === type) matches.push(item);
+    }
   }
-  return null;
+  if (!matches.length) return null;
+  if (category) {
+    var byCategory = matches.find(function (i) { return i.category === category; });
+    if (byCategory) return byCategory;
+  }
+  return matches[0];
 };
 
 AF.initPalette = function () {
@@ -64,6 +71,7 @@ function createItem(item) {
   el.addEventListener('dragstart', function (e) {
     e.dataTransfer.effectAllowed = 'copy';
     e.dataTransfer.setData('node-type', item.type);
+    e.dataTransfer.setData('node-category', item.category);
     var ghost = buildGhost(el);
     document.body.appendChild(ghost);
     e.dataTransfer.setDragImage(ghost, 70, 20);
