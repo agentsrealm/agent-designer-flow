@@ -6,10 +6,13 @@ window.AF = window.AF || {};
   AF.initPalette();
   AF.initCanvas();
   AF.initProperties();
+  AF.toolsCatalog.init();
+  AF.toolPicker.init();
   bindTopbar();
   bindContextMenu();
   bindImportExport();
   loadStarterFlow();
+  if (AF.embed && AF.embed.isEmbed) AF.embed.postReady();
 
   /* ── Topbar ── */
   function bindTopbar() {

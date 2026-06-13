@@ -46,8 +46,8 @@ AF.NODE_GROUPS = [
     id: 'work', label: 'Work Items',
     items: [
       { type:'tool-task', label:'Tool Task', icon:'🔧', category:'work',
-        defaultProps:{ name:'Tool Task', toolName:'', endpoint:'', inputSchema:'', outputSchema:'', auth:'none', rateLimit:'' },
-        tabs:['General','Schema','Auth'] },
+        defaultProps:{ name:'Tool Task', toolId:'', toolName:'', toolDisplayName:'', toolDescription:'', pluginId:'', pluginName:'', endpoint:'', auth:'none' },
+        tabs:['Select Tool'] },
       { type:'skill', label:'Skill', icon:'♻', category:'work',
         defaultProps:{ name:'Skill', skillId:'', description:'', version:'1.0', parameters:'', inputVars:[], outputVars:[], outputKey:'result' },
         tabs:['General','I/O','Output'] },

@@ -1,0 +1,190 @@
+/* data/tools-catalog.mock.js — inline mock catalog (works without HTTP server) */
+window.AF = window.AF || {};
+
+AF.MOCK_TOOLS_CATALOG = {
+  "schema": "agent-tools/v1",
+  "source": "mock",
+  "updatedAt": "2026-06-12T00:00:00Z",
+  "tools": [
+    {
+      "id": "slack_send_message",
+      "name": "slack_send_message",
+      "displayName": "Send Slack Message",
+      "description": "Post a message to a Slack channel or thread.",
+      "pluginId": "slack-mcp-plugin",
+      "pluginName": "Slack MCP",
+      "category": "communication",
+      "auth": "oauth2"
+    },
+    {
+      "id": "slack_search_public",
+      "name": "slack_search_public",
+      "displayName": "Search Slack",
+      "description": "Search public Slack messages and channels.",
+      "pluginId": "slack-mcp-plugin",
+      "pluginName": "Slack MCP",
+      "category": "communication",
+      "auth": "oauth2"
+    },
+    {
+      "id": "jira_search_issues",
+      "name": "jira_search_issues",
+      "displayName": "Search Jira Issues",
+      "description": "Run JQL queries and return matching issues.",
+      "pluginId": "atlassian-mcp-plugin",
+      "pluginName": "Atlassian MCP",
+      "category": "project",
+      "auth": "oauth2"
+    },
+    {
+      "id": "confluence_get_page",
+      "name": "confluence_get_page",
+      "displayName": "Get Confluence Page",
+      "description": "Fetch a Confluence page by ID or title.",
+      "pluginId": "atlassian-mcp-plugin",
+      "pluginName": "Atlassian MCP",
+      "category": "knowledge",
+      "auth": "oauth2"
+    },
+    {
+      "id": "github_create_pr",
+      "name": "github_create_pr",
+      "displayName": "Create Pull Request",
+      "description": "Open a pull request on a GitHub repository.",
+      "pluginId": "github-mcp-plugin",
+      "pluginName": "GitHub MCP",
+      "category": "developer",
+      "auth": "oauth2"
+    },
+    {
+      "id": "github_list_prs",
+      "name": "github_list_prs",
+      "displayName": "List Pull Requests",
+      "description": "List open or closed pull requests for a repo.",
+      "pluginId": "github-mcp-plugin",
+      "pluginName": "GitHub MCP",
+      "category": "developer",
+      "auth": "oauth2"
+    },
+    {
+      "id": "github_run_workflow",
+      "name": "github_run_workflow",
+      "displayName": "Run GitHub Workflow",
+      "description": "Trigger a GitHub Actions workflow dispatch.",
+      "pluginId": "github-mcp-plugin",
+      "pluginName": "GitHub MCP",
+      "category": "developer",
+      "auth": "oauth2"
+    },
+    {
+      "id": "postgres_query",
+      "name": "postgres_query",
+      "displayName": "PostgreSQL Query",
+      "description": "Execute a read-only SQL query against PostgreSQL.",
+      "pluginId": "data-mcp-plugin",
+      "pluginName": "Data MCP",
+      "category": "data",
+      "auth": "api-key"
+    },
+    {
+      "id": "postgres_insert",
+      "name": "postgres_insert",
+      "displayName": "PostgreSQL Insert",
+      "description": "Insert rows into an approved PostgreSQL table.",
+      "pluginId": "data-mcp-plugin",
+      "pluginName": "Data MCP",
+      "category": "data",
+      "auth": "api-key"
+    },
+    {
+      "id": "s3_get_object",
+      "name": "s3_get_object",
+      "displayName": "S3 Get Object",
+      "description": "Download an object from an S3 bucket.",
+      "pluginId": "data-mcp-plugin",
+      "pluginName": "Data MCP",
+      "category": "storage",
+      "auth": "api-key"
+    },
+    {
+      "id": "web_search",
+      "name": "web_search",
+      "displayName": "Web Search",
+      "description": "Search the public web and return summarized results.",
+      "pluginId": "research-mcp-plugin",
+      "pluginName": "Research MCP",
+      "category": "research",
+      "auth": "api-key"
+    },
+    {
+      "id": "web_fetch",
+      "name": "web_fetch",
+      "displayName": "Fetch URL",
+      "description": "Fetch and extract readable content from a URL.",
+      "pluginId": "research-mcp-plugin",
+      "pluginName": "Research MCP",
+      "category": "research",
+      "auth": "api-key"
+    },
+    {
+      "id": "send_email",
+      "name": "send_email",
+      "displayName": "Send Email",
+      "description": "Send an email via the configured SMTP gateway.",
+      "pluginId": "notify-mcp-plugin",
+      "pluginName": "Notify MCP",
+      "category": "communication",
+      "auth": "oauth2"
+    },
+    {
+      "id": "send_sms",
+      "name": "send_sms",
+      "displayName": "Send SMS",
+      "description": "Send an SMS message to a verified recipient.",
+      "pluginId": "notify-mcp-plugin",
+      "pluginName": "Notify MCP",
+      "category": "communication",
+      "auth": "api-key"
+    },
+    {
+      "id": "pagerduty_trigger",
+      "name": "pagerduty_trigger",
+      "displayName": "Trigger PagerDuty Incident",
+      "description": "Create or escalate a PagerDuty incident.",
+      "pluginId": "notify-mcp-plugin",
+      "pluginName": "Notify MCP",
+      "category": "ops",
+      "auth": "api-key"
+    },
+    {
+      "id": "stripe_create_refund",
+      "name": "stripe_create_refund",
+      "displayName": "Stripe Refund",
+      "description": "Issue a refund for a Stripe payment intent.",
+      "pluginId": "billing-mcp-plugin",
+      "pluginName": "Billing MCP",
+      "category": "billing",
+      "auth": "api-key"
+    },
+    {
+      "id": "stripe_lookup_invoice",
+      "name": "stripe_lookup_invoice",
+      "displayName": "Lookup Invoice",
+      "description": "Retrieve invoice details from Stripe by ID or customer.",
+      "pluginId": "billing-mcp-plugin",
+      "pluginName": "Billing MCP",
+      "category": "billing",
+      "auth": "api-key"
+    },
+    {
+      "id": "openai_embeddings",
+      "name": "openai_embeddings",
+      "displayName": "Generate Embeddings",
+      "description": "Create vector embeddings for supplied text chunks.",
+      "pluginId": "ml-mcp-plugin",
+      "pluginName": "ML MCP",
+      "category": "ai",
+      "auth": "api-key"
+    }
+  ]
+};

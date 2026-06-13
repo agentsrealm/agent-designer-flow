@@ -44,8 +44,8 @@ AF.validateFlow = function () {
     if (node.type === 'human-approval' && !p.approverRole)
       results.push({ severity:'error', msg:'Human Approval "'+node.label+'" must define an approver role.', nodeId:node.id });
 
-    if (node.type === 'tool-task' && !p.toolName)
-      results.push({ severity:'warning', msg:'Tool Task "'+node.label+'" has no tool name.', nodeId:node.id });
+    if (node.type === 'tool-task' && !p.toolName && !p.toolId)
+      results.push({ severity:'warning', msg:'Tool Task "'+node.label+'" has no tool selected.', nodeId:node.id });
 
     if (node.type === 'api-task' && !p.url)
       results.push({ severity:'warning', msg:'API Task "'+node.label+'" has no URL.', nodeId:node.id });

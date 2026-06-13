@@ -22,16 +22,19 @@ function renderPanel() {
   var tabs = def.tabs || ['General'];
 
   showContent();
+  var tabsHtml = tabs.length > 1 ? buildTabs(tabs) : '';
   _contentEl.innerHTML =
     buildHeader(node) +
-    buildTabs(tabs) +
+    tabsHtml +
     tabs.map(function (tab, i) {
-      return '<div class="props-tab-content" data-content="' + i + '">' + buildTabContent(tab, node, def) + '</div>';
+      return '<div class="props-tab-content' + (tabs.length === 1 ? ' active' : '') + '" data-content="' + i + '">' + buildTabContent(tab, node, def) + '</div>';
     }).join('') +
     '<div class="props-node-id">ID: ' + node.id + '</div>';
 
-  activateTab(_contentEl.querySelector('.props-tab'));
-  bindTabClicks();
+  if (tabs.length > 1) {
+    activateTab(_contentEl.querySelector('.props-tab'));
+    bindTabClicks();
+  }
   bindFormChanges(node);
 }
 
@@ -56,6 +59,7 @@ function buildTabs(tabs) {
 function buildTabContent(tab, node, def) {
   var p = node.props;
   switch (tab) {
+    case 'Select Tool':  return buildToolSelectTab(node, p);
     case 'General':      return buildGeneralTab(node, p);
     case 'Prompt':       return buildPromptTab(p);
     case 'Model':        return buildModelTab(p);
@@ -98,6 +102,31 @@ function buildTabContent(tab, node, def) {
 }
 
 /* ── Tab builders ── */
+function buildToolSelectTab(node, p) {
+  var selected = p.toolId || p.toolName;
+  var tool = selected && AF.toolsCatalog ? AF.toolsCatalog.findById(selected) : null;
+  var display = p.toolDisplayName || p.toolName || '';
+  var plugin = p.pluginName || '';
+  var desc = p.toolDescription || (tool && tool.description) || '';
+
+  var selectedBlock = selected
+    ? '<div class="tool-selected-card">'
+      + '<div class="tool-selected-head"><span class="tool-selected-icon">🔧</span>'
+      + '<div><div class="tool-selected-name">' + esc(display) + '</div>'
+      + '<div class="tool-selected-meta">' + esc(plugin) + (p.toolName ? ' · ' + esc(p.toolName) : '') + '</div></div></div>'
+      + (desc ? '<div class="tool-selected-desc">' + esc(desc) + '</div>' : '')
+      + '</div>'
+    : '<div class="tool-selected-empty">No tool selected yet.</div>';
+
+  return '<div class="tool-select-panel">'
+    + '<p class="tool-select-hint">Choose an MCP/API tool exposed by the host application.</p>'
+    + selectedBlock
+    + '<button type="button" class="btn-primary tool-select-btn" data-action="open-tool-picker">'
+    + (selected ? 'Change tool…' : 'Select tool…')
+    + '</button>'
+    + '</div>';
+}
+
 function buildGeneralTab(node, p) {
   var t = node.type, extra = '';
   if (t === 'start')           extra = field('Trigger Type', sel('trigger', p.trigger, ['chat','api','schedule','event','webhook']));
@@ -105,7 +134,7 @@ function buildGeneralTab(node, p) {
   else if (isAgentType(t))     extra = field('Role', inp('role',p.role,"Describe the agent's role")) + field('Goal', inp('goal',p.goal,'What should this agent achieve?'));
   else if (t==='task')         extra = field('Description', ta('description',p.description,'What does this task do?',3)) + field('Assigned Agent', inp('assignedAgent',p.assignedAgent,'Agent ID or name'));
   else if (t==='llm-task')     extra = field('Description', ta('description',p.description||'','',2)) + field('Assigned Agent', inp('assignedAgent',p.assignedAgent||'',''));
-  else if (t==='tool-task')    extra = field('Tool Name', inp('toolName',p.toolName,'e.g. web_search')) + field('Endpoint', inp('endpoint',p.endpoint,'https://...'));
+  else if (t==='tool-task')    extra = '';
   else if (t==='tool-call')    extra = field('Call Type', sel('callType',p.callType||'mcp',['mcp','api'])) + field('Server / Endpoint', inp('serverUrl',p.serverUrl||'','mcp://... or https://...')) + field('Tool Name', inp('toolName',p.toolName||'','e.g. search_documents'));
   else if (t==='skill')        extra = field('Skill ID', inp('skillId',p.skillId||'','Unique skill identifier')) + field('Description', ta('description',p.description||'','What this reusable skill does',2)) + field('Version', inp('version',p.version||'1.0',''));
   else if (t==='subflow')      extra = field('Flow Reference', inp('flowRef',p.flowRef||'','Flow name or path')) + field('Flow ID', inp('flowId',p.flowId||'','Nested flow ID')) + field('Description', ta('description',p.description||'','',2)) + tog('Run Async','async',p.async);
@@ -376,6 +405,10 @@ function updateBranch(nodeId, idx, fld, val) {
   AF.store.updateNode(nodeId, { props:{ branches:branches } });
 }
 function handleAction(action, node) {
+  if (action==='open-tool-picker') {
+    AF.toolPicker.open({ nodeId: node.id });
+    return;
+  }
   if (action==='add-tool') {
     var name = prompt('Tool name:'); if (!name) return;
     var tools = (AF.store.getNode(node.id).props.tools||[]).concat([name]);

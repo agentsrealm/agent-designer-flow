@@ -310,3 +310,201 @@ body.theme-light #properties-content::-webkit-scrollbar-thumb:hover { background
   justify-content: center;
   margin: 4px 0;
 }
+
+/* ── Tool Task — select tool panel ── */
+.tool-select-panel { padding: 4px 0; }
+.tool-select-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.45;
+  margin-bottom: 12px;
+}
+.tool-selected-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-base);
+  padding: 10px 12px;
+  margin-bottom: 12px;
+}
+.tool-selected-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.tool-selected-icon {
+  width: 28px; height: 28px;
+  border-radius: var(--radius-sm);
+  background: rgba(46,204,113,0.15);
+  color: var(--color-work);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.tool-selected-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.tool-selected-meta {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+.tool-selected-desc {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-top: 8px;
+  line-height: 1.4;
+}
+.tool-selected-empty {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-style: italic;
+  margin-bottom: 12px;
+  padding: 12px;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-md);
+  text-align: center;
+}
+.tool-select-btn { width: 100%; }
+
+/* ── Tool picker modal ── */
+.tool-picker-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  background: rgba(8, 10, 18, 0.62);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.tool-picker-modal.hidden { display: none !important; }
+.tool-picker-dialog {
+  width: min(520px, 100%);
+  max-height: min(640px, 92vh);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.tool-picker-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 18px 12px;
+  border-bottom: 1px solid var(--border);
+}
+.tool-picker-header h2 {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.tool-picker-subtitle {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+.tool-picker-search-wrap {
+  padding: 12px 18px 0;
+}
+.tool-picker-search {
+  width: 100%;
+  background: var(--bg-base);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 12px;
+  padding: 8px 10px;
+  outline: none;
+}
+.tool-picker-search:focus { border-color: var(--border-focus); }
+.tool-picker-list {
+  padding: 12px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  min-height: 200px;
+  max-height: 340px;
+}
+.tool-picker-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-base);
+  cursor: pointer;
+  transition: border-color 0.12s, background 0.12s;
+}
+.tool-picker-row:hover {
+  border-color: var(--accent);
+  background: var(--bg-hover);
+}
+.tool-picker-row-icon {
+  width: 28px; height: 28px;
+  border-radius: var(--radius-sm);
+  background: rgba(46,204,113,0.15);
+  color: var(--color-work);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-size: 13px;
+}
+.tool-picker-row-body { min-width: 0; flex: 1; }
+.tool-picker-row-title {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.tool-picker-row-meta {
+  display: block;
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+.tool-picker-row-desc {
+  display: block;
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+  line-height: 1.35;
+}
+.tool-picker-empty {
+  padding: 24px 18px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.tool-picker-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 18px 16px;
+  border-top: 1px solid var(--border);
+}
+.tool-picker-page-info {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.tool-picker-pager {
+  display: flex;
+  gap: 8px;
+}
+.tool-picker-pager .btn-outline {
+  padding: 4px 12px;
+  font-size: 11px;
+}
+.tool-picker-pager .btn-outline:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}

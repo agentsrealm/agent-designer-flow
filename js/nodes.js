@@ -12,7 +12,7 @@ var BODY_FIELDS = {
   'critic':          ['critiqueFocus','model'],
   'task':            ['assignedAgent','retryPolicy'],
   'llm-task':        ['model','temperature'],
-  'tool-task':       ['toolName','auth'],
+  'tool-task':       ['toolDisplayName','pluginName'],
   'tool-call':       ['callType','toolName'],
   'skill':           ['skillId','version'],
   'subflow':         ['flowRef','flowId'],

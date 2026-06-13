@@ -33,6 +33,8 @@
         <button class="btn-outline" id="btn-import">Import JSON</button>
         <button class="btn-outline" id="btn-export">Export JSON</button>
         <button class="btn-primary" id="btn-test-run">▶ Test Run</button>
+        <button class="btn-outline" id="btn-embed-cancel" style="display:none">Cancel</button>
+        <button class="btn-primary" id="btn-embed-save" style="display:none">Save to agent</button>
       </div>
     </header>
 
@@ -93,6 +95,31 @@
     <div id="context-menu" class="hidden">
       <ul id="context-menu-list"></ul>
     </div>
+
+    <!-- Tool picker modal (Tool Task) -->
+    <div id="tool-picker-modal" class="tool-picker-modal hidden" role="dialog" aria-modal="true" aria-labelledby="tool-picker-title">
+      <div class="tool-picker-dialog">
+        <div class="tool-picker-header">
+          <div>
+            <h2 id="tool-picker-title">Select tool</h2>
+            <p class="tool-picker-subtitle">MCP / API tools from the host application</p>
+          </div>
+          <button type="button" class="btn-icon" id="tool-picker-close" title="Close">✕</button>
+        </div>
+        <div class="tool-picker-search-wrap">
+          <input type="search" id="tool-picker-search" class="tool-picker-search" placeholder="Search tools by name, plugin, or description…" autocomplete="off" />
+        </div>
+        <div id="tool-picker-list" class="tool-picker-list"></div>
+        <div id="tool-picker-empty" class="tool-picker-empty hidden">No tools match your search.</div>
+        <div class="tool-picker-footer">
+          <span id="tool-picker-page-info" class="tool-picker-page-info"></span>
+          <div class="tool-picker-pager">
+            <button type="button" class="btn-outline" id="tool-picker-prev">Previous</button>
+            <button type="button" class="btn-outline" id="tool-picker-next">Next</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Hidden file input for import -->
@@ -100,13 +127,17 @@
 
   <!-- load in dependency order, no ES module needed -->
   <script src="data/node-types.js"></script>
+  <script src="data/tools-catalog.mock.js"></script>
   <script src="js/store.js"></script>
   <script src="js/palette.js"></script>
   <script src="js/nodes.js"></script>
   <script src="js/edges.js"></script>
   <script src="js/canvas.js"></script>
   <script src="js/properties.js"></script>
+  <script src="js/tools-catalog.js"></script>
+  <script src="js/tool-picker.js"></script>
   <script src="js/validation.js"></script>
+  <script src="js/embed.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
