@@ -59,7 +59,8 @@ function buildTabs(tabs) {
 function buildTabContent(tab, node, def) {
   var p = node.props;
   switch (tab) {
-    case 'Select Tool':  return buildToolSelectTab(node, p);
+    case 'Select Tool':      return buildToolSelectTab(node, p);
+    case 'Select Mock Tool': return buildMockToolSelectTab(node, p);
     case 'Select Skill': return buildSkillSelectTab(node, p);
     case 'Select Agent': return buildAgentSelectTab(node, p);
     case 'Select Subflow': return buildSubflowSelectTab(node, p);
@@ -126,6 +127,34 @@ function buildToolSelectTab(node, p) {
     + selectedBlock
     + '<button type="button" class="btn-primary tool-select-btn" data-action="open-tool-picker">'
     + (selected ? 'Change tool…' : 'Select tool…')
+    + '</button>'
+    + '</div>';
+}
+
+function buildMockToolSelectTab(node, p) {
+  var selected = p.toolId || p.toolName;
+  var tool = selected && AF.mockToolsCatalog ? AF.mockToolsCatalog.findById(selected) : null;
+  var display = p.toolDisplayName || p.toolName || '';
+  var plugin = p.pluginName || '';
+  var desc = p.toolDescription || (tool && tool.description) || '';
+
+  var selectedBlock = selected
+    ? '<div class="tool-selected-card mock-selected-card">'
+      + '<div class="tool-selected-head"><span class="tool-selected-icon">⚠️</span>'
+      + '<div><div class="tool-selected-name"><span class="mock-prefix">Mock</span> ' + esc(display) + '</div>'
+      + '<div class="tool-selected-meta">' + esc(plugin) + (p.toolName ? ' · ' + esc(p.toolName) : '') + '</div></div></div>'
+      + (desc ? '<div class="tool-selected-desc">' + esc(desc) + '</div>' : '')
+      + '</div>'
+    : '<div class="tool-selected-empty">No mock tool selected yet.</div>';
+
+  return '<div class="tool-select-panel">'
+    + '<div class="mock-task-banner">⚠️ <strong>Mock Task</strong> — temporary placeholder for an MCP/API tool. Replace with a real Tool Task before deploying.</div>'
+    + selectedBlock
+    + '<button type="button" class="btn-primary tool-select-btn" data-action="open-mock-tool-picker">'
+    + (selected ? 'Change mock tool…' : 'Select mock tool…')
+    + '</button>'
+    + '<button type="button" class="btn-outline tool-select-btn convert-live-btn" style="margin-top:8px" data-action="convert-to-live-tool">'
+    + '⚡ Promote to real Tool Task…'
     + '</button>'
     + '</div>';
 }
@@ -214,6 +243,7 @@ function buildGeneralTab(node, p) {
   else if (t==='task')         extra = field('Description', ta('description',p.description,'What does this task do?',3)) + field('Assigned Agent', inp('assignedAgent',p.assignedAgent,'Agent ID or name'));
   else if (t==='llm-task')     extra = field('Description', ta('description',p.description||'','',2)) + field('Assigned Agent', inp('assignedAgent',p.assignedAgent||'',''));
   else if (t==='tool-task')    extra = '';
+  else if (t==='mock-task')    extra = '';
   else if (t==='tool-call')    extra = field('Call Type', sel('callType',p.callType||'mcp',['mcp','api'])) + field('Server / Endpoint', inp('serverUrl',p.serverUrl||'','mcp://... or https://...')) + field('Tool Name', inp('toolName',p.toolName||'','e.g. search_documents'));
   else if (t==='skill')        extra = isWorkSkillNode(node) ? '' : field('Skill ID', inp('skillId',p.skillId||'','Unique skill identifier')) + field('Description', ta('description',p.description||'','What this reusable skill does',2)) + field('Version', inp('version',p.version||'1.0',''));
   else if (isWorkAgentNode(node)) extra = '';
@@ -487,6 +517,18 @@ function updateBranch(nodeId, idx, fld, val) {
 function handleAction(action, node) {
   if (action==='open-tool-picker') {
     AF.entityPicker.open({ kind: 'tool', nodeId: node.id });
+    return;
+  }
+  if (action==='open-mock-tool-picker') {
+    AF.entityPicker.open({ kind: 'mock-tool', nodeId: node.id });
+    return;
+  }
+  if (action==='convert-to-live-tool') {
+    AF.entityPicker.open({
+      kind: 'tool',
+      nodeId: node.id,
+      typeOverride: 'tool-task',
+    });
     return;
   }
   if (action==='open-skill-picker') {

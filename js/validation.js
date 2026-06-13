@@ -56,6 +56,9 @@ AF.validateFlow = function () {
     if (node.type === 'tool-task' && !p.toolName && !p.toolId)
       results.push({ severity:'warning', msg:'Tool Task "'+node.label+'" has no tool selected.', nodeId:node.id });
 
+    if (node.type === 'mock-task')
+      results.push({ severity:'warning', msg:'Mock Task "'+node.label+'" is a placeholder — replace with a real Tool Task before deploying.', nodeId:node.id });
+
     if (node.type === 'api-task' && !p.url)
       results.push({ severity:'warning', msg:'API Task "'+node.label+'" has no URL.', nodeId:node.id });
   });

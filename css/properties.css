@@ -368,6 +368,32 @@ body.theme-light #properties-content::-webkit-scrollbar-thumb:hover { background
 }
 .tool-select-btn { width: 100%; }
 
+/* ── Mock Task ── */
+.mock-task-banner {
+  font-size: 11px;
+  color: #b8860b;
+  background: rgba(243,156,18,0.1);
+  border: 1px solid rgba(243,156,18,0.35);
+  border-radius: var(--radius-sm);
+  padding: 7px 10px;
+  margin-bottom: 12px;
+  line-height: 1.45;
+}
+.mock-selected-card { border-color: rgba(243,156,18,0.5); }
+.mock-prefix {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #b8860b;
+  background: rgba(243,156,18,0.15);
+  border-radius: 3px;
+  padding: 1px 4px;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+
 /* ── Tool picker modal ── */
 .tool-picker-modal {
   position: fixed;

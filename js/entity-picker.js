@@ -42,6 +42,19 @@ window.AF = window.AF || {};
       noneText: 'No agents found',
       idAttr: 'data-item-id',
     },
+    'mock-tool': {
+      catalog: function () { return AF.mockToolsCatalog; },
+      request: function () { AF.mockToolsCatalog.requestFromHost(); },
+      readyEvent: 'af-mock-tools-catalog-ready',
+      updatedEvent: 'af-mock-tools-catalog-updated',
+      icon: '⚠️',
+      title: 'Select mock tool',
+      subtitle: 'Mock MCP/API tools — replace with a real Tool Task before deploying',
+      placeholder: 'Search mock tools by name, plugin, or description…',
+      emptyText: 'No mock tools match your search.',
+      noneText: 'No mock tools found',
+      idAttr: 'data-item-id',
+    },
     subflow: {
       catalog: function () { return AF.subflowsCatalog; },
       request: function () { AF.subflowsCatalog.requestFromHost(); },
@@ -71,7 +84,7 @@ window.AF = window.AF || {};
   }
 
   function rowMeta(item) {
-    if (_kind === 'tool') return esc(item.pluginName) + ' · ' + esc(item.name);
+    if (_kind === 'tool' || _kind === 'mock-tool') return esc(item.pluginName) + ' · ' + esc(item.name);
     if (_kind === 'skill') return esc(item.category) + ' · v' + esc(item.version) + ' · ' + esc(item.name);
     if (_kind === 'subflow') return 'v' + esc(item.version) + ' · ' + esc(item.nodeCount) + ' nodes · ' + esc(item.name);
     return esc(item.role) + ' · ' + esc(item.model) + ' · ' + esc(item.name);

@@ -7,6 +7,7 @@ window.AF = window.AF || {};
   AF.initCanvas();
   AF.initProperties();
   AF.toolsCatalog.init();
+  AF.mockToolsCatalog.init();
   AF.skillsCatalog.init();
   AF.agentsCatalog.init();
   AF.subflowsCatalog.init();

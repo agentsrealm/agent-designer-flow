@@ -1,0 +1,90 @@
+/* data/mock-tools-catalog.mock.js — inline mock catalog for Mock Task nodes */
+window.AF = window.AF || {};
+
+AF.MOCK_MOCK_TOOLS_CATALOG = {
+  "schema": "mock-tools/v1",
+  "source": "mock",
+  "updatedAt": "2026-06-13T00:00:00Z",
+  "tools": [
+    {
+      "id": "mock_send_email",
+      "name": "mock_send_email",
+      "displayName": "Send Email",
+      "description": "Mock: sends an email to one or more recipients.",
+      "pluginId": "mock-email-plugin",
+      "pluginName": "Mock Email",
+      "category": "communication",
+      "auth": "none"
+    },
+    {
+      "id": "mock_query_database",
+      "name": "mock_query_database",
+      "displayName": "Query Database",
+      "description": "Mock: runs a SQL query against the configured database.",
+      "pluginId": "mock-db-plugin",
+      "pluginName": "Mock Database",
+      "category": "data",
+      "auth": "none"
+    },
+    {
+      "id": "mock_http_get",
+      "name": "mock_http_get",
+      "displayName": "HTTP GET",
+      "description": "Mock: performs an HTTP GET request to a given URL.",
+      "pluginId": "mock-http-plugin",
+      "pluginName": "Mock HTTP",
+      "category": "integration",
+      "auth": "none"
+    },
+    {
+      "id": "mock_http_post",
+      "name": "mock_http_post",
+      "displayName": "HTTP POST",
+      "description": "Mock: performs an HTTP POST request with a JSON body.",
+      "pluginId": "mock-http-plugin",
+      "pluginName": "Mock HTTP",
+      "category": "integration",
+      "auth": "none"
+    },
+    {
+      "id": "mock_read_file",
+      "name": "mock_read_file",
+      "displayName": "Read File",
+      "description": "Mock: reads a file from the configured storage location.",
+      "pluginId": "mock-storage-plugin",
+      "pluginName": "Mock Storage",
+      "category": "storage",
+      "auth": "none"
+    },
+    {
+      "id": "mock_write_file",
+      "name": "mock_write_file",
+      "displayName": "Write File",
+      "description": "Mock: writes content to a file in the configured storage location.",
+      "pluginId": "mock-storage-plugin",
+      "pluginName": "Mock Storage",
+      "category": "storage",
+      "auth": "none"
+    },
+    {
+      "id": "mock_create_ticket",
+      "name": "mock_create_ticket",
+      "displayName": "Create Ticket",
+      "description": "Mock: creates a support or project ticket in a placeholder system.",
+      "pluginId": "mock-ticketing-plugin",
+      "pluginName": "Mock Ticketing",
+      "category": "project",
+      "auth": "none"
+    },
+    {
+      "id": "mock_search_records",
+      "name": "mock_search_records",
+      "displayName": "Search Records",
+      "description": "Mock: searches records in a placeholder data source.",
+      "pluginId": "mock-search-plugin",
+      "pluginName": "Mock Search",
+      "category": "data",
+      "auth": "none"
+    }
+  ]
+};

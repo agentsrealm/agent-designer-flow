@@ -71,6 +71,11 @@ AF.NODE_GROUPS = [
         tabs: ['Select Tool']
       },
       {
+        type: 'mock-task', label: 'Mock Task', icon: '⚠️', category: 'work',
+        defaultProps: { name: 'Mock Task', toolId: '', toolName: '', toolDisplayName: '', toolDescription: '', pluginId: '', pluginName: '', endpoint: '', auth: 'none' },
+        tabs: ['Select Mock Tool']
+      },
+      {
         type: 'skill', label: 'Skill', icon: '♻', category: 'work',
         defaultProps: { name: 'Skill', skillId: '', skillName: '', skillDisplayName: '', skillDescription: '', version: '1.0', category: '', parameters: '', inputVars: [], outputVars: [], outputKey: 'result' },
         tabs: ['Select Skill']

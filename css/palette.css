@@ -144,6 +144,9 @@ body.theme-light #palette-content::-webkit-scrollbar-thumb:hover {
 .palette-item[data-category="start"]   .node-icon { background: rgba(26,188,156,0.15); color: var(--color-start); }
 .palette-item[data-category="end"]     .node-icon { background: rgba(231,76,60,0.15);  color: var(--color-end); }
 
+/* mock-task uses amber icon in palette to signal it's a placeholder */
+.palette-item[data-type="mock-task"] .node-icon { background: rgba(243,156,18,0.15); color: var(--color-control); }
+
 /* drag ghost */
 .palette-drag-ghost {
   position: fixed;

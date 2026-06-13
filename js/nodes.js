@@ -13,6 +13,7 @@ var BODY_FIELDS = {
   'task':            ['assignedAgent','retryPolicy'],
   'llm-task':        ['model','temperature'],
   'tool-task':       ['toolDisplayName','pluginName'],
+  'mock-task':       ['toolDisplayName','pluginName'],
   'tool-call':       ['callType','toolName'],
   'skill':           ['skillDisplayName','version'],
   'subflow':         ['subflowDisplayName','version'],
