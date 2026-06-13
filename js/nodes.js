@@ -64,6 +64,19 @@ AF.buildNodeEl = function (node) {
       + '<div class="circle-icon">' + node.icon + '</div>'
       + '<div class="circle-label">' + node.label + '</div>'
       + '</div>';
+  } else if (node.type === 'decision') {
+    el.innerHTML =
+      ports
+      + '<div class="node-main node-diamond" data-drag-handle>'
+      + '<svg class="diamond-outline" viewBox="0 0 100 100" aria-hidden="true">'
+      + '<polygon points="50,4 96,50 50,96 4,50" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>'
+      + '</svg>'
+      + '<div class="diamond-inner">'
+      + '<div class="diamond-icon">' + node.icon + '</div>'
+      + '<div class="diamond-label">' + node.label + '</div>'
+      + '<div class="diamond-meta">' + renderDiamondMeta(fields, node.props) + '</div>'
+      + '</div>'
+      + '</div>';
   } else {
     el.innerHTML =
       ports
@@ -87,12 +100,24 @@ AF.updateNodeEl = function (el, node) {
   if (node.type === 'start' || node.type === 'end') {
     var lbl = el.querySelector('.circle-label');
     if (lbl) lbl.textContent = node.label;
+  } else if (node.type === 'decision') {
+    var dLbl = el.querySelector('.diamond-label');
+    var dMeta = el.querySelector('.diamond-meta');
+    if (dLbl) dLbl.textContent = node.label;
+    if (dMeta) dMeta.textContent = renderDiamondMeta(BODY_FIELDS[node.type] || [], node.props);
   } else {
     var fields = BODY_FIELDS[node.type] || [];
     el.querySelector('.nh-title').textContent = node.label;
     el.querySelector('.node-body').innerHTML  = renderBody(fields, node.props);
   }
 };
+
+function renderDiamondMeta(fields, props) {
+  var k = fields[0];
+  if (!k || props[k] === undefined || props[k] === '' || props[k] === null) return '';
+  var val = String(props[k]);
+  return val.length > 14 ? val.slice(0, 12) + '…' : val;
+}
 
 function renderBody(fields, props) {
   var rows = fields
