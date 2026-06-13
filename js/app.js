@@ -250,6 +250,15 @@ window.AF = window.AF || {};
           var label = prompt('Edge label:', edge ? edge.label || '' : '');
           if (label !== null) AF.store.updateEdge(id, { label: label });
         });
+        addItem('📍  Add Waypoint Here', function(){
+          AF.addWaypointAtClient(id, cx, cy);
+        });
+        var edge = AF.store.getEdge(id);
+        if (edge && edge.waypoints && edge.waypoints.length > 0) {
+          addItem('✖  Clear Waypoints', function(){
+            AF.store.updateEdge(id, { waypoints: [] });
+          });
+        }
         addSep();
         addItem('🗑  Delete Connection', function(){ AF.store.deleteEdge(id); }, 'danger');
       }

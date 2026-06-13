@@ -421,6 +421,17 @@
 .edge-endpoint:hover { r: 7; fill: var(--accent); stroke: #fff; }
 .edge-endpoint:active { cursor: grabbing; }
 
+/* Waypoint bend-point handles */
+.waypoint-handle {
+  fill: var(--bg-elevated);
+  stroke: #4a7cff;
+  stroke-width: 2;
+  pointer-events: all;
+  cursor: grab;
+}
+.waypoint-handle:hover { fill: #4a7cff; stroke: #fff; stroke-width: 2.5; }
+.waypoint-handle:active { cursor: grabbing; }
+
 .edge-label {
   font-size: 10px;
   font-family: var(--font);

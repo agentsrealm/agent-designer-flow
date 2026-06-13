@@ -200,6 +200,7 @@ function bindNodeInteractions() {
   });
 
   window.addEventListener('mousemove', function (e) {
+    if (AF.isDraggingWaypoint()) return;
     if (AF.isRewiring()) {
       AF.updateRewire(e.clientX, e.clientY);
       return;
@@ -232,6 +233,7 @@ function bindNodeInteractions() {
   });
 
   window.addEventListener('mouseup', function (e) {
+    if (AF.isDraggingWaypoint()) return;
     if (AF.isRewiring()) {
       AF.endRewire(e.clientX, e.clientY);
       return;

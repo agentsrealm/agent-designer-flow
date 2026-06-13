@@ -1,7 +1,8 @@
-/* js/edges.js — SVG edge rendering and connection dragging */
+/* js/edges.js — SVG edge rendering, connection dragging, and waypoint bend-point editing */
 window.AF = window.AF || {};
 
 var _svg, _connectLine, _connecting, _rewiring;
+var _draggingWaypoint = null; // { edgeId, index, origX, origY, startMouseX, startMouseY, origWaypoints }
 var PORT_SIDES = ['top', 'right', 'bottom', 'left'];
 var SIDE_OUT = {
   top:    [0, -1],
@@ -21,6 +22,38 @@ AF.initEdges = function () {
   _svg.addEventListener('mousedown', function (e) {
     if (e.target === _svg && e.button === 0) AF.store.deselect();
   });
+
+  // Bind waypoint drag handlers once at init time
+  window.addEventListener('mousemove', function (e) {
+    if (!_draggingWaypoint) return;
+    var p = clientToSvg(e.clientX, e.clientY);
+    var zoom = AF.store.get('zoom');
+    // Delta is in SVG screen coords; divide by zoom to get world-coord delta
+    var dx = (p.x - _draggingWaypoint.startMouseX) / zoom;
+    var dy = (p.y - _draggingWaypoint.startMouseY) / zoom;
+    var wps = _draggingWaypoint.origWaypoints.map(function (w) { return { x: w.x, y: w.y }; });
+    wps[_draggingWaypoint.index] = {
+      x: _draggingWaypoint.origX + dx,
+      y: _draggingWaypoint.origY + dy,
+    };
+    // Mutate edge directly for real-time update without pushing undo on every frame
+    var edge = AF.store.getEdge(_draggingWaypoint.edgeId);
+    if (edge) {
+      edge.waypoints = wps;
+      AF.renderEdges();
+    }
+  });
+
+  window.addEventListener('mouseup', function (e) {
+    if (!_draggingWaypoint) return;
+    var edge = AF.store.getEdge(_draggingWaypoint.edgeId);
+    if (edge) {
+      // Push undo-able commit
+      AF.store.updateEdge(_draggingWaypoint.edgeId, { waypoints: edge.waypoints.slice() });
+    }
+    _draggingWaypoint = null;
+  });
+
   AF.renderEdges();
 };
 
@@ -95,6 +128,44 @@ AF.nearestPortSide = function (nodeEl, clientX, clientY) {
   return best;
 };
 
+// Build a polyline path string through an array of points [{x,y}, ...]
+function polylinePath(points) {
+  if (!points || points.length === 0) return '';
+  var d = 'M ' + points[0].x + ' ' + points[0].y;
+  for (var i = 1; i < points.length; i++) {
+    d += ' L ' + points[i].x + ' ' + points[i].y;
+  }
+  return d;
+}
+
+// Find which segment index a point is nearest to.
+// segments defined by consecutive points in the array.
+// Returns the index of the segment start (0-based), so insert after index i means insert at position i+1 in waypoints.
+function nearestSegmentIndex(points, px, py) {
+  var bestIdx = 0, bestDist = Infinity;
+  for (var i = 0; i < points.length - 1; i++) {
+    var ax = points[i].x, ay = points[i].y;
+    var bx = points[i + 1].x, by = points[i + 1].y;
+    var d = pointToSegmentDistSq(px, py, ax, ay, bx, by);
+    if (d < bestDist) { bestDist = d; bestIdx = i; }
+  }
+  return bestIdx;
+}
+
+function pointToSegmentDistSq(px, py, ax, ay, bx, by) {
+  var dx = bx - ax, dy = by - ay;
+  var lenSq = dx * dx + dy * dy;
+  if (lenSq === 0) {
+    var ex = px - ax, ey = py - ay;
+    return ex * ex + ey * ey;
+  }
+  var t = ((px - ax) * dx + (py - ay) * dy) / lenSq;
+  t = Math.max(0, Math.min(1, t));
+  var nx = ax + t * dx - px;
+  var ny = ay + t * dy - py;
+  return nx * nx + ny * ny;
+}
+
 AF.renderEdges = function () {
   Array.from(_svg.querySelectorAll('.edge-group')).forEach(function (e) { e.remove(); });
 
@@ -120,9 +191,22 @@ AF.renderEdges = function () {
     var start = trimPoint(p2.x, p2.y, p1.x, p1.y, 5);
     var end   = trimPoint(p1.x, p1.y, p2.x, p2.y, 6);
 
+    // Waypoints are stored in world coords (same as node.x/y).
+    // Convert to SVG screen coords for rendering: screenX = worldX * zoom + panX
+    var waypoints = (edge.waypoints && edge.waypoints.length > 0) ? edge.waypoints : null;
+    var waypointsScreen = waypoints
+      ? waypoints.map(function (wp) { return { x: wp.x * zoom + panX, y: wp.y * zoom + panY }; })
+      : null;
+
+    var pathD;
+    if (waypointsScreen) {
+      pathD = polylinePath([start].concat(waypointsScreen).concat([end]));
+    } else {
+      pathD = bezier(start.x, start.y, end.x, end.y, srcSide, tgtSide);
+    }
+
     var edgeDef = AF.EDGE_TYPES.find(function (e) { return e.value === (edge.type || 'control'); }) || AF.EDGE_TYPES[0];
     var isSelected = AF.store.get('selectedType') === 'edge' && AF.store.get('selectedId') === edge.id;
-    var pathD = bezier(start.x, start.y, end.x, end.y, srcSide, tgtSide);
 
     var g = svgEl('g');
     g.className.baseVal = 'edge-group' + (isSelected ? ' selected' : '');
@@ -146,6 +230,7 @@ AF.renderEdges = function () {
       AF.store.select(edge.id, 'edge');
       window.dispatchEvent(new CustomEvent('show-context-menu', { detail:{ cx:e.clientX, cy:e.clientY, type:'edge', id:edge.id } }));
     });
+
     g.appendChild(hit);
 
     var path = svgEl('path');
@@ -155,6 +240,7 @@ AF.renderEdges = function () {
     g.appendChild(path);
 
     if (isSelected) {
+      // Source/target endpoint handles (existing rewire handles)
       [
         { end: 'source', pt: p1 },
         { end: 'target', pt: p2 },
@@ -174,6 +260,46 @@ AF.renderEdges = function () {
         });
         g.appendChild(c);
       });
+
+      // Waypoint handles — positioned using screen coords, but origX/Y stored in world coords
+      if (waypoints && waypointsScreen) {
+        waypoints.forEach(function (wp, idx) {
+          var wps = waypointsScreen[idx];
+          var wc = svgEl('circle');
+          wc.setAttribute('cx', wps.x);
+          wc.setAttribute('cy', wps.y);
+          wc.setAttribute('r', 6);
+          wc.className.baseVal = 'waypoint-handle';
+
+          // Mousedown: start drag — store world-coord origin so pan/zoom don't skew the drag
+          wc.addEventListener('mousedown', function (e) {
+            if (e.button !== 0) return;
+            e.stopPropagation();
+            e.preventDefault();
+            var mouseStart = clientToSvg(e.clientX, e.clientY);
+            _draggingWaypoint = {
+              edgeId: edge.id,
+              index: idx,
+              origX: wp.x,   // world coords
+              origY: wp.y,   // world coords
+              startMouseX: mouseStart.x,  // SVG screen coords
+              startMouseY: mouseStart.y,
+              origWaypoints: waypoints.map(function (w) { return { x: w.x, y: w.y }; }),
+            };
+          });
+
+          // Right-click: delete this waypoint
+          wc.addEventListener('contextmenu', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var newWps = waypoints.slice();
+            newWps.splice(idx, 1);
+            AF.store.updateEdge(edge.id, { waypoints: newWps });
+          });
+
+          g.appendChild(wc);
+        });
+      }
     }
 
     if (edge.label) {
@@ -402,8 +528,38 @@ AF.cancelRewire = function () {
   clearDropTargets();
 };
 
-AF.isConnecting       = function () { return !!_connecting; };
-AF.isRewiring         = function () { return !!_rewiring; };
-AF.connectingSourceId = function () { return _connecting ? _connecting.sourceId : null; };
+AF.addWaypointAtClient = function (edgeId, clientX, clientY) {
+  var edge = AF.store.getEdge(edgeId);
+  if (!edge) return;
+  var p = clientToSvg(clientX, clientY);
+
+  var srcNode = AF.store.getNode(edge.source);
+  var tgtNode = AF.store.getNode(edge.target);
+  if (!srcNode || !tgtNode) return;
+  var srcEl = document.getElementById(edge.source);
+  var tgtEl = document.getElementById(edge.target);
+  var zoom = AF.store.get('zoom'), panX = AF.store.get('panX'), panY = AF.store.get('panY');
+  var ports = autoPorts(srcNode, tgtNode);
+  var p1 = (srcEl && portCenter(srcEl, edge.sourcePort || ports.sourcePort)) || portPos(srcEl, srcNode, edge.sourcePort || ports.sourcePort, zoom, panX, panY);
+  var p2 = (tgtEl && portCenter(tgtEl, edge.targetPort || ports.targetPort)) || portPos(tgtEl, tgtNode, edge.targetPort || ports.targetPort, zoom, panX, panY);
+  var start = trimPoint(p2.x, p2.y, p1.x, p1.y, 5);
+  var end   = trimPoint(p1.x, p1.y, p2.x, p2.y, 6);
+
+  var currentWps = (edge.waypoints && edge.waypoints.length > 0) ? edge.waypoints.slice() : [];
+  // Convert existing world-coord waypoints to screen coords for segment lookup
+  var currentWpsScreen = currentWps.map(function (wp) { return { x: wp.x * zoom + panX, y: wp.y * zoom + panY }; });
+  var allPoints = [start].concat(currentWpsScreen).concat([end]);
+  var segIdx = nearestSegmentIndex(allPoints, p.x, p.y);
+  // Convert click point from SVG screen coords to world coords before storing
+  var newWpWorld = { x: (p.x - panX) / zoom, y: (p.y - panY) / zoom };
+  var newWps = currentWps.slice();
+  newWps.splice(segIdx, 0, newWpWorld);
+  AF.store.updateEdge(edgeId, { waypoints: newWps });
+};
+
+AF.isConnecting        = function () { return !!_connecting; };
+AF.isRewiring          = function () { return !!_rewiring; };
+AF.isDraggingWaypoint  = function () { return !!_draggingWaypoint; };
+AF.connectingSourceId  = function () { return _connecting ? _connecting.sourceId : null; };
 
 function svgEl(tag) { return document.createElementNS('http://www.w3.org/2000/svg', tag); }
