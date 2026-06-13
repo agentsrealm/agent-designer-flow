@@ -14,7 +14,6 @@ window.AF = window.AF || {};
   AF.entityPicker.init();
   bindTopbar();
   bindContextMenu();
-  bindImportExport();
   if (!AF.embed || !AF.embed.isEmbed) loadStarterFlow();
   if (AF.embed && AF.embed.isEmbed) AF.embed.postReady();
 
@@ -27,42 +26,12 @@ window.AF = window.AF || {};
     document.getElementById('btn-fit').addEventListener('click', AF.fitScreen);
     document.getElementById('btn-auto-layout').addEventListener('click', AF.autoLayout);
 
-    document.getElementById('btn-validate').addEventListener('click', function () {
-      var panel   = document.getElementById('validation-panel');
-      var results = AF.validateFlow();
-      AF.renderValidation(results);
-      panel.classList.toggle('hidden');
-    });
-    document.getElementById('btn-close-validation').addEventListener('click', function () {
-      document.getElementById('validation-panel').classList.add('hidden');
-    });
-
-    document.getElementById('btn-test-run').addEventListener('click', function () {
-      document.getElementById('testrun-panel').classList.toggle('hidden');
-    });
-    document.getElementById('btn-close-testrun').addEventListener('click', function () {
-      document.getElementById('testrun-panel').classList.add('hidden');
-    });
-    document.getElementById('btn-run-flow').addEventListener('click', simulateRun);
-
     var panBtn = document.getElementById('btn-pan-mode');
     panBtn.addEventListener('click', function () {
       var on = !AF.isPanMode();
       AF.setPanMode(on);
       panBtn.classList.toggle('active', on);
       panBtn.title = on ? 'Pan Mode ON — click to disable' : 'Pan Mode (drag canvas)';
-    });
-
-    document.getElementById('btn-new').addEventListener('click', function () {
-      if (AF.store.get('nodes').length > 0) {
-        if (!confirm('Clear the canvas and start a new flow?')) return;
-      }
-      AF.store.importJSON({
-        schema: 'agent-flow/v1',
-        metadata: { name: 'Untitled Flow' },
-        nodes: [], edges: [], runtime: { engine: 'agentcore' },
-      });
-      document.getElementById('flow-name-label').textContent = 'Untitled Flow';
     });
 
     var nameEl = document.getElementById('flow-name-label');
@@ -83,6 +52,77 @@ window.AF = window.AF || {};
       applyTheme(!isLight);
       // repaint grid with new palette
       AF.store.setZoom(AF.store.get('zoom'));
+    });
+
+    var flowOptBtn  = document.getElementById('btn-flow-options');
+    var flowOptMenu = document.getElementById('flow-options-menu');
+    flowOptBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var open = flowOptMenu.hasAttribute('hidden');
+      flowOptMenu.toggleAttribute('hidden', !open);
+      flowOptBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    document.addEventListener('click', function () {
+      if (!flowOptMenu.hasAttribute('hidden')) {
+        flowOptMenu.setAttribute('hidden', '');
+        flowOptBtn.setAttribute('aria-expanded', 'false');
+      }
+    });
+    flowOptMenu.addEventListener('click', function (e) { e.stopPropagation(); });
+
+    function closeFlowMenu() {
+      flowOptMenu.setAttribute('hidden', '');
+      flowOptBtn.setAttribute('aria-expanded', 'false');
+    }
+
+    document.getElementById('fom-save-draft').addEventListener('click', function () {
+      closeFlowMenu();
+      var name = AF.store.get('flowName') || 'Untitled Flow';
+      var drafts = JSON.parse(localStorage.getItem('af-drafts') || '{}');
+      drafts[name] = AF.store.exportJSON();
+      localStorage.setItem('af-drafts', JSON.stringify(drafts));
+      alert('Draft saved: ' + name);
+    });
+
+    document.getElementById('fom-delete-draft').addEventListener('click', function () {
+      closeFlowMenu();
+      var name = AF.store.get('flowName') || 'Untitled Flow';
+      var drafts = JSON.parse(localStorage.getItem('af-drafts') || '{}');
+      if (!drafts[name]) { alert('No draft found for: ' + name); return; }
+      if (!confirm('Delete draft "' + name + '"?')) return;
+      delete drafts[name];
+      localStorage.setItem('af-drafts', JSON.stringify(drafts));
+      alert('Draft deleted: ' + name);
+    });
+
+    document.getElementById('fom-publish').addEventListener('click', function () {
+      closeFlowMenu();
+      var name = AF.store.get('flowName') || 'Untitled Flow';
+      var published = JSON.parse(localStorage.getItem('af-published') || '{}');
+      published[name] = AF.store.exportJSON();
+      localStorage.setItem('af-published', JSON.stringify(published));
+      alert('Published: ' + name);
+    });
+
+    document.getElementById('fom-unpublish').addEventListener('click', function () {
+      closeFlowMenu();
+      var name = AF.store.get('flowName') || 'Untitled Flow';
+      var published = JSON.parse(localStorage.getItem('af-published') || '{}');
+      if (!published[name]) { alert('No published version found for: ' + name); return; }
+      if (!confirm('Unpublish "' + name + '"?')) return;
+      delete published[name];
+      localStorage.setItem('af-published', JSON.stringify(published));
+      alert('Unpublished: ' + name);
+    });
+
+    document.getElementById('fom-clear-all').addEventListener('click', function () {
+      closeFlowMenu();
+      if (!confirm('Clear all nodes and edges from the canvas?')) return;
+      AF.store.importJSON({
+        schema: 'agent-flow/v1',
+        metadata: { name: AF.store.get('flowName') || 'Untitled Flow' },
+        nodes: [], edges: [], runtime: { engine: 'agentcore' },
+      });
     });
   }
 
@@ -185,35 +225,6 @@ window.AF = window.AF || {};
     copy.id   = newId; copy.x = node.x + 40; copy.y = node.y + 40; copy.label = node.label + ' (copy)';
     AF.store.addNode(copy);
     AF.store.select(newId, 'node');
-  }
-
-  /* ── Import / Export ── */
-  function bindImportExport() {
-    document.getElementById('btn-export').addEventListener('click', function () {
-      var data = JSON.stringify(AF.store.exportJSON(), null, 2);
-      var blob = new Blob([data], { type:'application/json' });
-      var url  = URL.createObjectURL(blob);
-      var a    = document.createElement('a');
-      a.href = url; a.download = (AF.store.get('flowName')||'flow').replace(/\s+/g,'_') + '.flow.json';
-      a.click();
-      URL.revokeObjectURL(url);
-    });
-    document.getElementById('btn-import').addEventListener('click', function () {
-      document.getElementById('import-file').click();
-    });
-    document.getElementById('import-file').addEventListener('change', function (e) {
-      var file = e.target.files[0]; if (!file) return;
-      var reader = new FileReader();
-      reader.onload = function (ev) {
-        try {
-          var data = JSON.parse(ev.target.result);
-          AF.store.importJSON(data);
-          document.getElementById('flow-name-label').textContent = AF.store.get('flowName');
-        } catch (err) { alert('Invalid JSON file: ' + err.message); }
-      };
-      reader.readAsText(file);
-      e.target.value = '';
-    });
   }
 
   /* ── Starter demo flow — work items (Agent, Skill, Tool Task) ── */

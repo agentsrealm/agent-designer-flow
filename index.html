@@ -16,6 +16,24 @@
       <div class="topbar-left">
         <span class="logo">⬡ AgentFlow</span>
         <span class="flow-name" id="flow-name-label" contenteditable="true">Untitled Flow</span>
+        <div class="flow-options-wrapper">
+          <button class="btn-flow-options" id="btn-flow-options" title="Flow options" aria-haspopup="true" aria-expanded="false">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="8" cy="3" r="1.5"/>
+              <circle cx="8" cy="8" r="1.5"/>
+              <circle cx="8" cy="13" r="1.5"/>
+            </svg>
+          </button>
+          <div class="flow-options-menu" id="flow-options-menu" role="menu" hidden>
+            <button class="flow-options-menu-item" id="fom-save-draft" role="menuitem">Save Draft</button>
+            <button class="flow-options-menu-item" id="fom-delete-draft" role="menuitem">Delete Draft</button>
+            <div class="flow-options-menu-separator"></div>
+            <button class="flow-options-menu-item" id="fom-publish" role="menuitem">Publish</button>
+            <button class="flow-options-menu-item" id="fom-unpublish" role="menuitem">Unpublish</button>
+            <div class="flow-options-menu-separator"></div>
+            <button class="flow-options-menu-item" id="fom-clear-all" role="menuitem">Clear All</button>
+          </div>
+        </div>
       </div>
       <div class="topbar-center">
         <button class="btn-icon" id="btn-undo" title="Undo">↩</button>
@@ -28,11 +46,6 @@
       </div>
       <div class="topbar-right">
         <button class="btn-icon" id="btn-theme" title="Toggle Light / Dark theme">☀</button>
-        <button class="btn-outline" id="btn-new">New</button>
-        <button class="btn-outline" id="btn-validate">Validate</button>
-        <button class="btn-outline" id="btn-import">Import JSON</button>
-        <button class="btn-outline" id="btn-export">Export JSON</button>
-        <button class="btn-primary" id="btn-test-run">▶ Test Run</button>
         <button class="btn-outline" id="btn-embed-cancel" style="display:none">Cancel</button>
         <button class="btn-primary" id="btn-embed-save" style="display:none">Save to agent</button>
       </div>

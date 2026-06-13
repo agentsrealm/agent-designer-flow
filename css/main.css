@@ -119,6 +119,67 @@ html, body, #app {
   background: var(--bg-elevated);
 }
 
+.flow-options-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.btn-flow-options {
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.btn-flow-options:hover {
+  background: var(--bg-elevated);
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+.flow-options-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.18);
+  min-width: 200px;
+  z-index: 900;
+  padding: 4px 0;
+  display: flex;
+  flex-direction: column;
+}
+.flow-options-menu[hidden] { display: none; }
+.flow-options-menu-item {
+  background: none;
+  border: none;
+  text-align: left;
+  padding: 8px 16px;
+  font-size: 13px;
+  color: var(--text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+.flow-options-menu-item:hover {
+  background: var(--bg-hover, var(--bg-panel));
+}
+.flow-options-menu-separator {
+  height: 1px;
+  background: var(--border);
+  margin: 4px 0;
+}
+
 /* ── Buttons ── */
 .btn-icon {
   background: none;
