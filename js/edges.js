@@ -448,6 +448,11 @@ AF.startRewire = function (edgeId, end, clientX, clientY) {
     ? (portCenter(fixedEl, fixedSide) || clientToSvg(clientX, clientY))
     : clientToSvg(clientX, clientY);
 
+  var zoom = AF.store.get('zoom'), panX = AF.store.get('panX'), panY = AF.store.get('panY');
+  var waypointsScreen = (edge.waypoints && edge.waypoints.length > 0)
+    ? edge.waypoints.map(function (wp) { return { x: wp.x * zoom + panX, y: wp.y * zoom + panY }; })
+    : [];
+
   _rewiring = {
     edgeId: edgeId,
     end: end,
@@ -456,6 +461,7 @@ AF.startRewire = function (edgeId, end, clientX, clientY) {
     fixedX: fixedPt.x,
     fixedY: fixedPt.y,
     dragSide: edge[end + 'Port'] || fixedSide,
+    waypointsScreen: waypointsScreen,
   };
 
   if (!_connectLine) {
@@ -484,7 +490,14 @@ AF.updateRewire = function (clientX, clientY) {
     dragSide = snapSide;
   }
 
-  if (_rewiring.end === 'source') {
+  var wps = _rewiring.waypointsScreen;
+  if (wps && wps.length > 0) {
+    // Preserve existing waypoints in the preview; dragged end connects via straight segments
+    var pts = _rewiring.end === 'source'
+      ? [p].concat(wps).concat([{ x: _rewiring.fixedX, y: _rewiring.fixedY }])
+      : [{ x: _rewiring.fixedX, y: _rewiring.fixedY }].concat(wps).concat([p]);
+    _connectLine.setAttribute('d', polylinePath(pts));
+  } else if (_rewiring.end === 'source') {
     _connectLine.setAttribute('d', bezier(p.x, p.y, _rewiring.fixedX, _rewiring.fixedY, dragSide, _rewiring.fixedSide));
   } else {
     _connectLine.setAttribute('d', bezier(_rewiring.fixedX, _rewiring.fixedY, p.x, p.y, _rewiring.fixedSide, dragSide));
