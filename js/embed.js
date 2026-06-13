@@ -33,6 +33,29 @@ window.AF = window.AF || {};
     if (nameEl) AF.store.setFlowName((nameEl.textContent || '').trim() || 'Untitled Flow');
   }
 
+  function exportFlowJson() {
+    syncFlowNameFromUi();
+    return AF.store.exportJSON();
+  }
+
+  function closeFlowOptionsMenu() {
+    var menu = document.getElementById('flow-options-menu');
+    var btn = document.getElementById('btn-flow-options');
+    if (menu) menu.setAttribute('hidden', '');
+    if (btn) btn.setAttribute('aria-expanded', 'false');
+  }
+
+  function wireEmbedDraftSave() {
+    var saveDraft = document.getElementById('fom-save-draft');
+    if (!saveDraft || !saveDraft.parentNode) return;
+    var replacement = saveDraft.cloneNode(true);
+    saveDraft.parentNode.replaceChild(replacement, saveDraft);
+    replacement.addEventListener('click', function () {
+      closeFlowOptionsMenu();
+      postToParent('FLOW_DRAFT_SAVE', exportFlowJson());
+    });
+  }
+
   function applyEmbedChrome() {
     document.body.classList.add('af-embed');
     var hideIds = ['btn-new', 'btn-import', 'btn-test-run'];
@@ -53,7 +76,7 @@ window.AF = window.AF || {};
           document.getElementById('validation-panel').classList.remove('hidden');
           return;
         }
-        postToParent('FLOW_SAVE', AF.store.exportJSON());
+        postToParent('FLOW_SAVE', exportFlowJson());
       });
     }
     if (cancelBtn) {
@@ -64,6 +87,22 @@ window.AF = window.AF || {};
     }
   }
 
+  function scheduleFitView() {
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        AF.fitScreen && AF.fitScreen();
+      });
+    });
+  }
+
+  function hasSavedViewport(data) {
+    var vp = data && data.viewport;
+    return !!(vp && typeof vp === 'object'
+      && typeof vp.zoom === 'number'
+      && typeof vp.panX === 'number'
+      && typeof vp.panY === 'number');
+  }
+
   function loadFlow(data) {
     if (!data || typeof data !== 'object') {
       AF.store.importJSON(emptyFlow());
@@ -72,7 +111,9 @@ window.AF = window.AF || {};
     }
     var nameEl = document.getElementById('flow-name-label');
     if (nameEl) nameEl.textContent = AF.store.get('flowName');
-    AF.fitScreen && AF.fitScreen();
+    if (!hasSavedViewport(data)) {
+      scheduleFitView();
+    }
   }
 
   window.addEventListener('message', function (event) {
@@ -107,5 +148,8 @@ window.AF = window.AF || {};
     emptyFlow: emptyFlow,
   };
 
-  if (isEmbed) applyEmbedChrome();
+  if (isEmbed) {
+    applyEmbedChrome();
+    window.addEventListener('load', wireEmbedDraftSave);
+  }
 })();

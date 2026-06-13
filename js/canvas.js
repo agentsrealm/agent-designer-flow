@@ -333,15 +333,28 @@ AF.zoomIn    = function () { AF.store.setZoom(AF.store.get('zoom') * 1.15); };
 AF.zoomOut   = function () { AF.store.setZoom(AF.store.get('zoom') / 1.15); };
 AF.fitScreen = function () {
   var nodes = AF.store.get('nodes');
-  if (!nodes.length) { AF.store.setZoom(1); AF.store.setPan(60,60); return; }
-  var minX = Math.min.apply(null, nodes.map(function(n){return n.x;}));
-  var minY = Math.min.apply(null, nodes.map(function(n){return n.y;}));
-  var maxX = Math.max.apply(null, nodes.map(function(n){return n.x+180;}));
-  var maxY = Math.max.apply(null, nodes.map(function(n){return n.y+100;}));
-  var cw = _canvasContainer.offsetWidth - 80, ch = _canvasContainer.offsetHeight - 80;
-  var zoom = Math.min(cw/(maxX-minX), ch/(maxY-minY), 2);
+  if (!nodes.length) { AF.store.setZoom(1); AF.store.setPan(60, 60); return; }
+  var minX = Math.min.apply(null, nodes.map(function (n) { return n.x; }));
+  var minY = Math.min.apply(null, nodes.map(function (n) { return n.y; }));
+  var maxX = Math.max.apply(null, nodes.map(function (n) { return n.x + 180; }));
+  var maxY = Math.max.apply(null, nodes.map(function (n) { return n.y + 100; }));
+  var bboxW = maxX - minX;
+  var bboxH = maxY - minY;
+  // Avoid over-zoom when nodes are clustered in a small area
+  var fitW = Math.max(bboxW, 480);
+  var fitH = Math.max(bboxH, 320);
+  var pad = 64;
+  var cw = Math.max(_canvasContainer.offsetWidth - pad * 2, 200);
+  var ch = Math.max(_canvasContainer.offsetHeight - pad * 2, 200);
+  var zoom = Math.min(cw / fitW, ch / fitH, 1);
+  zoom = Math.max(zoom, 0.35);
   AF.store.setZoom(zoom);
-  AF.store.setPan(40 - minX*zoom, 40 - minY*zoom);
+  var cx = minX + bboxW / 2;
+  var cy = minY + bboxH / 2;
+  AF.store.setPan(
+    _canvasContainer.offsetWidth / 2 - cx * zoom,
+    _canvasContainer.offsetHeight / 2 - cy * zoom
+  );
 };
 
 AF.autoLayout = function () {

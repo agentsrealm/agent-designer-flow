@@ -20,6 +20,23 @@ window.AF = window.AF || {};
     _listeners.filter(l => l.event === event).forEach(l => l.fn());
   }
 
+  function applyViewport(data) {
+    var vp = data && data.viewport;
+    if (!vp || typeof vp !== 'object') return false;
+    if (typeof vp.zoom === 'number' && !isNaN(vp.zoom)) {
+      _state.zoom = Math.max(0.2, Math.min(3, vp.zoom));
+    }
+    if (typeof vp.panX === 'number' && !isNaN(vp.panX)) {
+      _state.panX = vp.panX;
+    }
+    if (typeof vp.panY === 'number' && !isNaN(vp.panY)) {
+      _state.panY = vp.panY;
+    }
+    emit('zoom');
+    emit('pan');
+    return true;
+  }
+
   AF.store = {
     get(key)      { return _state[key]; },
     getNode(id)   { return _state.nodes.find(n => n.id === id); },
@@ -115,6 +132,11 @@ window.AF = window.AF || {};
         nodes: _state.nodes,
         edges: _state.edges,
         runtime: { engine: 'agentcore' },
+        viewport: {
+          zoom: _state.zoom,
+          panX: _state.panX,
+          panY: _state.panY,
+        },
       };
     },
     importJSON(data) {
@@ -124,6 +146,7 @@ window.AF = window.AF || {};
       _state.edges = data.edges || [];
       const ids = _state.nodes.map(n => parseInt(n.id.replace('node_','')) || 0);
       _state._counter = (ids.length ? Math.max.apply(null, ids) : 0) + 1;
+      applyViewport(data);
       AF.store.deselect();
       emit('nodes'); emit('edges'); emit('import');
     },
@@ -135,6 +158,7 @@ window.AF = window.AF || {};
       _state.edges = JSON.parse(JSON.stringify(data.edges || []));
       var ids = _state.nodes.map(function (n) { return parseInt(String(n.id).replace('node_', ''), 10) || 0; });
       _state._counter = (ids.length ? Math.max.apply(null, ids) : 0) + 1;
+      applyViewport(data);
       AF.store.deselect();
       emit('nodes'); emit('edges'); emit('import');
     },
