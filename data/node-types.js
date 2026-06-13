@@ -65,7 +65,7 @@ AF.NODE_GROUPS = [
   {
     id: 'control', label: 'Control Flow',
     items: [
-      { type:'decision', label:'Decision / Router', icon:'◇', category:'control',
+      { type:'decision', label:'Decision / Router', icon:'⑂', category:'control',
         defaultProps:{ name:'Decision', condition:'', conditionType:'expression', branches:[{label:'True',condition:''},{label:'False',condition:''}], fallbackBranch:'False' },
         tabs:['General','Branches'] },
       { type:'loop', label:'Loop', icon:'↺', category:'control',
